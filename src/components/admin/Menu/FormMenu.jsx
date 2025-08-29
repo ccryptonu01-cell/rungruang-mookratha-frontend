@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../utils/axiosInstance";
+import axiosInstance from "../../../utils/axiosInstance";
 import useEcomStore from "../../../store/ecom-store";
 import { Plus, XCircle } from "lucide-react";
 import { toast } from "react-toastify";

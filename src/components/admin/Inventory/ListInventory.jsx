@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axiosInstance from "../utils/axiosInstance";
+import axiosInstance from "../../../utils/axiosInstance";
 import useEcomStore from "../../../store/ecom-store";
 import { deleteInventory, updateInventory } from "../../../api/Inventory";
 import EditInventoryModal from "./EditInventoryModal";

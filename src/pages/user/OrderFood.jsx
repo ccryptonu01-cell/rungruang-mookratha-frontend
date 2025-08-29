@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../utils/axiosInstance";
+import axios from "../../utils/axiosInstance";
 import ProductCard from "../../components/card/ProductCard";
 import useEcomStore from "../../store/ecom-store";
 import FilterMenu from "../../components/admin/Menu/FilterMenu";

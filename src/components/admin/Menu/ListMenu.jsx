@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axiosInstance from "../utils/axiosInstance";
+import axiosInstance from "../../../utils/axiosInstance";
 import { UtensilsCrossed } from "lucide-react";
 import useEcomStore from "../../../store/ecom-store";
 import { toast } from "react-toastify";

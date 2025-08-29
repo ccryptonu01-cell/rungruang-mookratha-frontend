@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axiosInstance from "../utils/axiosInstance";
+import axiosInstance from "../../utils/axiosInstance";
 
 const EditPaymentMethodModal = ({ order, token, onClose }) => {
     const [method, setMethod] = useState(order.paymentMethod || "");

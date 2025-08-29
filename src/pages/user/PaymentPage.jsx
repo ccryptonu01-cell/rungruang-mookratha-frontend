@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import axios from "../utils/axiosInstance";
+import axios from "../../utils/axiosInstance";
 import useCartStore from "../../store/cart-store";
 import { useNavigate } from "react-router-dom";
 

@@ -1,4 +1,4 @@
-import axiosInstance from "../utils/axiosInstance";
+import axiosInstance from "../../utils/axiosInstance";
 import { toast } from "react-toastify";
 
 const ManageOrderModalCashier = ({ order, token, onClose, onUpdated }) => {
