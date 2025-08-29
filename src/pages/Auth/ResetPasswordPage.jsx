@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "../utils/axiosInstance";
+import axios from "../../utils/axiosInstance";
 
 const ResetPasswordPage = () => {
     const [newPassword, setNewPassword] = useState("");
