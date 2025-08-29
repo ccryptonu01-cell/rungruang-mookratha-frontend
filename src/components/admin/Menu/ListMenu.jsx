@@ -19,7 +19,7 @@ const ListMenu = ({ refreshTrigger }) => {
 
     const fetchMenus = async () => {
         try {
-            const res = await axiosInstance.get("/menu");
+            const res = await axiosInstance.get("/admin/menu");
             setMenus(res.data.menus);
         } catch (err) {
             console.error("ดึงข้อมูลเมนูล้มเหลว", err);
