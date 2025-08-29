@@ -5,3 +5,5 @@ export default defineConfig({
   base: "/",
   plugins: [react()],
 })
+
+// trigger rebuild for .env.production
