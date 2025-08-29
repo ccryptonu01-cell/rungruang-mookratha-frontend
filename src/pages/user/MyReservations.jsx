@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import axios from "../utils/axiosInstance";
+import axios from "../../utils/axiosInstance";
 import useEcomStore from "../../store/ecom-store";
 
 const MyReservations = () => {
