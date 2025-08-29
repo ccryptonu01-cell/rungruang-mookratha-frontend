@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 
 const AddOrderModal = ({ token, onClose, onSuccess }) => {
@@ -10,7 +10,7 @@ const AddOrderModal = ({ token, onClose, onSuccess }) => {
     useEffect(() => {
         const fetchMenus = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/menu");
+                const res = await axiosInstance.get("/menu");
                 setMenus(res.data.menus);
             } catch (err) {
                 console.error("ดึงเมนูล้มเหลว", err);
@@ -65,7 +65,7 @@ const AddOrderModal = ({ token, onClose, onSuccess }) => {
                 slipUrl: null,
             };
 
-            await axios.post("http://localhost:5000/api/admin/orders", payload, {
+            await axiosInstance.post("/admin/orders", payload, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

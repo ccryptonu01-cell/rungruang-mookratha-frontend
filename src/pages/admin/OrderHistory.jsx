@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 import useEcomStore from "../../store/ecom-store";
 import * as XLSX from "xlsx";
 import { ArrowLeft, Download } from "lucide-react";
@@ -21,8 +21,8 @@ const OrderHistory = () => {
       setLoading(true);
       setError("");
       const url = start && end
-        ? `http://localhost:5000/api/admin/orders/summary-7-days?start=${start}&end=${end}`
-        : "http://localhost:5000/api/admin/orders/summary-7-days";
+        ? `/admin/orders/summary-7-days?start=${start}&end=${end}`
+        : "/admin/orders/summary-7-days";
 
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -39,7 +39,7 @@ const OrderHistory = () => {
     if (!year || !month) return;
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/admin/orders/summary-by-month?year=${year}&month=${month}`,
+        `/admin/orders/summary-by-month?year=${year}&month=${month}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMonthlySummary(res.data.summary);

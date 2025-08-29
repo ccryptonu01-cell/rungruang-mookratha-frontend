@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 import useEcomStore from "../../store/ecom-store";
 import EditOrderModal from "../../components/modal/EditOrderModal";
 import EditPaymentMethodModal from "../../components/modal/EditPaymentMethodModal";
@@ -34,7 +34,7 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/orders", {
+      const res = await axios.get("/admin/orders", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrders([...res.data.orders]);
@@ -367,7 +367,7 @@ const Orders = () => {
           onConfirm={async () => {
             try {
               await axios.put(
-                `http://localhost:5000/api/admin/orders/${orderToCancel.id}`,
+                `/admin/orders/${orderToCancel.id}`,
                 { status: "CANCELLED" },
                 { headers: { Authorization: `Bearer ${token}` } }
               );

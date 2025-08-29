@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import axios from "../utils/axiosInstance";
 
 const TIME_SLOTS = [
   "16:00 - 17:00",
@@ -26,21 +27,14 @@ const GuestMyResev = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/reservations/guest-check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const res = await axios.post("/reservations/guest-check", form);
 
-      const data = await res.json();
+      const data = res.data;
 
-      if (res.ok) {
-        setReservations(data.reservations || []);
-      } else {
-        toast.error(data.message || "ไม่พบรายการจอง");
-      }
+      setReservations(data.reservations || []);
     } catch (err) {
-      toast.error("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+      const message = err?.response?.data?.message || "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+      toast.error(message);
     }
   };
 
@@ -49,37 +43,30 @@ const GuestMyResev = () => {
     if (!confirmCancel) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/reservations/${reservationId}/cancel`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await axios.put(`/reservations/${reservationId}/cancel`);
 
-      const data = await res.json();
+      const data = res.data;
 
-      if (res.ok) {
-        toast.success("ยกเลิกการจองสำเร็จ");
+      toast.success("ยกเลิกการจองสำเร็จ");
 
+      setReservations(prev =>
+        prev.map(r =>
+          r.reservationId === reservationId
+            ? { ...r, status: "CANCELLED" }
+            : r
+        )
+      );
+
+      setTimeout(() => {
         setReservations(prev =>
-          prev.map(r =>
-            r.reservationId === reservationId
-              ? { ...r, status: "CANCELLED" }
-              : r
-          )
+          prev.filter(r => r.reservationId !== reservationId)
         );
-
-        setTimeout(() => {
-          setReservations(prev =>
-            prev.filter(r => r.reservationId !== reservationId)
-          );
-        }, 3000);
-      } else {
-        toast.error(data.message || "ไม่สามารถยกเลิกได้");
-      }
+      }, 3000);
     } catch (err) {
-      toast.error("เกิดข้อผิดพลาดในการยกเลิก");
+      const message = err?.response?.data?.message || "เกิดข้อผิดพลาดในการยกเลิก";
+      toast.error(message);
     }
   };
-
 
   const getTimeSlotLabel = (startTimeStr) => {
     const startTime = new Date(startTimeStr).toLocaleTimeString("th-TH", {

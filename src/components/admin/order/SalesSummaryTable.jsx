@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import useEcomStore from "../../../store/ecom-store";
 
 const SalesSummaryTable = ({ startDate, endDate }) => {
@@ -11,7 +11,7 @@ const SalesSummaryTable = ({ startDate, endDate }) => {
     useEffect(() => {
         const fetchSummary = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/admin/orders/summary-7-days", {
+                const res = await axiosInstance.get("/admin/orders/summary-7-days", {
                     headers: { Authorization: `Bearer ${token}` },
                     params: { start: startDate, end: endDate },
                 });

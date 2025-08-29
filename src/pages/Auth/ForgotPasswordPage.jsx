@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 
 const ForgotPasswordPage = () => {
     const [email, setEmail] = useState("");
@@ -13,11 +13,11 @@ const ForgotPasswordPage = () => {
         setError("");
 
         try {
-            const res = await axios.post("http://localhost:5000/api/auth/forgot-password", {
+            const res = await axios.post("/auth/forgot-password", {
                 email,
             });
             setMessage(res.data.message);
-            setShowModal(true); // ✅ แสดง Modal เมื่อส่งอีเมลสำเร็จ
+            setShowModal(true);
         } catch (err) {
             setError(err.response?.data?.message || "เกิดข้อผิดพลาด");
         }

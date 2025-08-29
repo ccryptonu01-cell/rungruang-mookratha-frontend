@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { AlertCircle } from "lucide-react";
 
 const DashboardAlertCashier = () => {
@@ -8,8 +8,8 @@ const DashboardAlertCashier = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const unpaidRes = await axios.get(
-                    "http://localhost:5000/api/cashier/alert/unpaid-orders",
+                const unpaidRes = await axiosInstance.get(
+                    "/cashier/alert/unpaid-orders",
                     {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem("token")}`,

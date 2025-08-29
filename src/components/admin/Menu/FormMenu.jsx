@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import useEcomStore from "../../../store/ecom-store";
 import { Plus, XCircle } from "lucide-react";
 import { toast } from "react-toastify";
@@ -24,7 +24,7 @@ const FormMenu = ({ onAddSuccess }) => {
 
         const fetchCategories = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/admin/category", {
+                const res = await axiosInstance.get("/admin/category", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setCategories(res.data.categories);
@@ -64,7 +64,7 @@ const FormMenu = ({ onAddSuccess }) => {
         formData.append("categoryId", parseInt(categoryId)); // ✅ ตรงนี้สำคัญมาก
 
         try {
-            await axios.post("http://localhost:5000/api/admin/menu", formData, {
+            await axiosInstance.post("/admin/menu", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${token}`,

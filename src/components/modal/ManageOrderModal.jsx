@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -14,8 +14,8 @@ const ManageOrderModal = ({ order, token, onClose }) => {
 
     const updatePaymentStatus = async (statusText) => {
         try {
-            await axios.put(
-                `http://localhost:5000/api/admin/orders/${order.id}`,
+            await axiosInstance.put(
+                `/admin/orders/${order.id}`,
                 { paymentStatus: statusText },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -29,8 +29,8 @@ const ManageOrderModal = ({ order, token, onClose }) => {
 
     const handleCancel = async () => {
         try {
-            await axios.put(
-                `http://localhost:5000/api/admin/orders/${order.id}`,
+            await axiosInstance.put(
+                `/admin/orders/${order.id}`,
                 { status: "CANCELLED" },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

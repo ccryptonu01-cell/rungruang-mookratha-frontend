@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 import ProductCard from "../components/card/ProductCard";
 import FilterMenuGuest from "../components/FilterMenuGuest";
 
@@ -14,7 +14,7 @@ const Menu = () => {
   useEffect(() => {
     const fetchMenus = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/g-menu");
+        const res = await axios.get("/g-menu");
         setMenus(res.data.menus);
       } catch (err) {
         console.error("ดึงเมนูล้มเหลว:", err);
@@ -23,7 +23,7 @@ const Menu = () => {
 
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/g-category");
+        const res = await axios.get("/g-category");
         setCategories(res.data.categories);
       } catch (err) {
         console.error("ดึงหมวดหมู่ล้มเหลว:", err);

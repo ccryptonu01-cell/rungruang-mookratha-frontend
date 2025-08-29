@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { CheckCircle, XCircle, Star } from "lucide-react";
 
 const tableLayout = [
@@ -38,7 +38,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                     return;
                 }
 
-                const res = await axios.get("http://localhost:5000/api/tables", {
+                const res = await axiosInstance.get("/tables", {
                     params: {
                         selectedTime: selectedDateTime.toISOString(),
                     },
@@ -46,7 +46,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
 
                 const statusMap = {};
                 res.data.tables.forEach((table) => {
-                    statusMap[table.tableNumber] = table.status; // ✅ ใช้ status ของ backend โดยตรง!
+                    statusMap[table.tableNumber] = table.status;
                 });
                 setTableStatus(statusMap);
             } catch (err) {

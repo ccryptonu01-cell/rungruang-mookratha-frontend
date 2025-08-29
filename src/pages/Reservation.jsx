@@ -5,6 +5,7 @@ import MainNav from "../components/MainNav";
 import UserNav from "../components/UserNav";
 import TableMap from "../components/Reserv/Table";
 import { toast } from "react-toastify";
+import axios from "../utils/axiosInstance";
 
 const TIME_SLOTS = [
   "16:00 - 17:00",
@@ -89,8 +90,10 @@ const Reservation = () => {
     };
 
     const endpoint = isGuest
-      ? "http://localhost:5000/api/reservations"
-      : "http://localhost:5000/api/user/reservations";
+      ? "/reservations"
+      : "/user/reservations";
+
+    const res = await axios.get(endpoint, payload);
 
     try {
       const res = await fetch(endpoint, {

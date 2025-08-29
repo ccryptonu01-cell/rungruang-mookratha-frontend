@@ -1,12 +1,11 @@
-// src/api/Inventory.js
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 export const fetchMenus = () => {
-  return axios.get("http://localhost:5000/api/menu");
+  return axiosInstance.get("/menu");
 };
 
 export const createInventory = (token, form) => {
-  return axios.post("http://localhost:5000/api/admin/inventory", form, {
+  return axiosInstance.post("/admin/inventory", form, {
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -14,7 +13,7 @@ export const createInventory = (token, form) => {
 };
 
 export const updateInventory = (token, id, data) => {
-  return axios.put(`http://localhost:5000/api/admin/inventory/${id}`, data, {
+  return axiosInstance.put(`/admin/inventory/${id}`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -22,7 +21,7 @@ export const updateInventory = (token, id, data) => {
 };
 
 export const deleteInventory = (token, id) => {
-  return axios.delete(`http://localhost:5000/api/admin/inventory/${id}`, {
+  return axiosInstance.delete(`/admin/inventory/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

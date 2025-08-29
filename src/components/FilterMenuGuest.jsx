@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 const FilterMenuGuest = ({ selectedCategoryId, setSelectedCategoryId }) => {
@@ -9,7 +9,7 @@ const FilterMenuGuest = ({ selectedCategoryId, setSelectedCategoryId }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/g-category");
+        const res = await axiosInstance.get("/g-category");
         setCategories(res.data.categories);
       } catch (err) {
         console.error("ดึงหมวดหมู่ล้มเหลว", err);

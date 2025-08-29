@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from "../utils/axiosInstance";
 import Modal from '../../../src/components/modal/EditPassword';
 
 const ProfileInfo = () => {
@@ -23,7 +23,7 @@ const ProfileInfo = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/auth/profile', {
+        const res = await axios.get('/auth/profile', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -57,7 +57,7 @@ const ProfileInfo = () => {
 
   const handleSaveProfile = async () => {
     try {
-      const res = await axios.put('http://localhost:5000/api/auth/profile', editForm, {
+      const res = await axios.put('/auth/profile', editForm, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       showModal(res.data.message || 'อัปเดตโปรไฟล์สำเร็จ!');
@@ -84,7 +84,7 @@ const ProfileInfo = () => {
 
     try {
       const res = await axios.put(
-        'http://localhost:5000/api/auth/profile',
+        '/auth/profile',
         { password: newPassword.trim() },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 import useEcomStore from "../../store/ecom-store";
 import { DisplayResultsCashier } from "../../components/cashier/DisplayResultsCashier";
 import DashboardAlertCashier from "../../components/alert/DashboardAlertCashier";
@@ -25,7 +25,7 @@ const Dashboard = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/cashier/orders", {
+      const res = await axios.get("/cashier/orders", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrders(res.data.orders || []);
@@ -36,7 +36,7 @@ const Dashboard = () => {
 
   const fetchReservations = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/cashier/reservations", {
+      const res = await axios.get("/cashier/reservations", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 const EditPaymentMethodModal = ({ order, token, onClose }) => {
     const [method, setMethod] = useState(order.paymentMethod || "");
 
     const handleSave = async () => {
         try {
-            await axios.put(
-                `http://localhost:5000/api/admin/orders/${order.id}`,
+            await axiosInstance.put(
+                `/admin/orders/${order.id}`,
                 { paymentMethod: method },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

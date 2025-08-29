@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 
 const ManageUsers = () => {
@@ -16,7 +16,7 @@ const ManageUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/users", {
+      const res = await axios.get("/admin/users", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -37,7 +37,7 @@ const ManageUsers = () => {
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบผู้ใช้งานนี้?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/admin/user/${userId}`, {
+      await axios.delete(`/admin/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -54,7 +54,7 @@ const ManageUsers = () => {
   const changeUserRole = async (userId, newRole) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/admin/user/${userId}/role`,
+        `/admin/user/${userId}/role`,
         { role: newRole },
         {
           headers: {
@@ -85,7 +85,7 @@ const ManageUsers = () => {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/${rolePath}/user/${selectedUser.id}/password`,
+        `/${rolePath}/user/${selectedUser.id}/password`,
         { password: newPassword },
         {
           headers: {

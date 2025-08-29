@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import useEcomStore from "../../../store/ecom-store";
 import { deleteInventory, updateInventory } from "../../../api/Inventory";
 import EditInventoryModal from "./EditInventoryModal";
@@ -15,7 +15,7 @@ const ListInventory = ({ refreshTrigger }) => {
 
     const fetchInventory = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/admin/inventory", {
+            const res = await axiosInstance.get("/api/admin/inventory", {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

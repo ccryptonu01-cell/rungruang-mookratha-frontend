@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 
 const ReservationsCashier = () => {
@@ -23,7 +23,7 @@ const ReservationsCashier = () => {
 
   const fetchReservations = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/cashier/reservations", {
+      const res = await axios.get("/cashier/reservations", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -55,7 +55,7 @@ const ReservationsCashier = () => {
   const handleUpdateStatus = async (newStatus) => {
     try {
       await axios.put(
-        "http://localhost:5000/api/cashier/reservations/status",
+        "/cashier/reservations/status",
         {
           tableNumber: selectedReservation?.table?.tableNumber,
           status: newStatus,

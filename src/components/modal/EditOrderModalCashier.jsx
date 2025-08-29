@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 import useEcomStore from "../../store/ecom-store";
 
@@ -13,8 +13,8 @@ const EditOrderModalCashier = ({ order, onClose, onRefresh }) => {
     useEffect(() => {
         if (!token) return;
 
-        axios
-            .get("http://localhost:5000/api/cashier/menu", {
+        axiosInstance
+            .get("/cashier/menu", {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => setMenuItems(res.data.menus))
@@ -90,8 +90,8 @@ const EditOrderModalCashier = ({ order, onClose, onRefresh }) => {
                 })),
             };
 
-            await axios.put(
-                `http://localhost:5000/api/cashier/orders/detail/${order.id}`,
+            await axiosInstance.put(
+                `/cashier/orders/detail/${order.id}`,
                 payload,
                 {
                     headers: { Authorization: `Bearer ${token}` },

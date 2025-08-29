@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import dayjs from "dayjs";
 import useEcomStore from "../../store/ecom-store";
 import "dayjs/locale/th";
@@ -14,14 +14,14 @@ export const DisplayResultsCashier = () => {
 
     useEffect(() => {
         if (token) {
-            axios
-                .get("http://localhost:5000/api/cashier/orders", {
+            axiosInstance
+                .get("/cashier/orders", {
                     headers: { Authorization: `Bearer ${token}` },
                 })
                 .then((res) => setOrders(res.data.orders || []));
 
-            axios
-                .get("http://localhost:5000/api/cashier/reservations", {
+            axiosInstance
+                .get("/cashier/reservations", {
                     headers: { Authorization: `Bearer ${token}` },
                 })
                 .then((res) => {

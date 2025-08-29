@@ -1,5 +1,5 @@
-import axios from "axios"
+import axiosInstance from "../utils/axiosInstance";
 
 export const fetchMenus = async () => {
-  return await axios.get("http://localhost:5000/api/menu")
+  return await axiosInstance.get("/menu")
 }

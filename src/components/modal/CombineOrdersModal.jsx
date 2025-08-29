@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import "../../fonts/THSarabunNew.js";
@@ -16,7 +16,7 @@ const CombineOrdersModal = ({ tableId, token, onClose }) => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/admin/orders", {
+        const res = await axiosInstance.get("/admin/orders", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setOrders(res.data.orders || []);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 import useCartStore from "../../store/cart-store";
 import { useNavigate } from "react-router-dom";
 
@@ -42,7 +42,7 @@ const PaymentPage = () => {
             }
 
             axios
-                .post("http://localhost:5000/api/payment/qr", { amount: total })
+                .post("/payment/qr", { amount: total })
                 .then((res) => setQrData(res.data))
                 .catch((err) => {
                     console.error("QR Error:", err);
@@ -72,7 +72,7 @@ const PaymentPage = () => {
         };
 
         try {
-            await axios.post("http://localhost:5000/api/orders", payload, {
+            await axios.post("/orders", payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

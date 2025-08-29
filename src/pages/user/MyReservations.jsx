@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 import useEcomStore from "../../store/ecom-store";
 
 const MyReservations = () => {
@@ -11,8 +11,8 @@ const MyReservations = () => {
   const fetchReservations = async (date = "") => {
     try {
       const url = date
-        ? `http://localhost:5000/api/user/reservations?date=${date}`
-        : "http://localhost:5000/api/user/reservations";
+        ? `/user/reservations?date=${date}`
+        : "/user/reservations";
 
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -50,7 +50,7 @@ const MyReservations = () => {
 
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/user/reservations/${reservationId}`,
+        `/user/reservations/${reservationId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

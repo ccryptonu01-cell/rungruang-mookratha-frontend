@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 
 const MyOrders = () => {
@@ -10,7 +10,7 @@ const MyOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/user/my-orders", {
+        const res = await axios.get("/user/my-orders", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         setOrders(res.data.orders || []);
@@ -32,7 +32,7 @@ const MyOrders = () => {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/user/orders/${selectedOrder.orderId}/cancel`,
+        `/user/orders/${selectedOrder.orderId}/cancel`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );

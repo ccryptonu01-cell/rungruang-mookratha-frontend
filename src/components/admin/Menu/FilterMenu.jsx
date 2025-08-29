@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import useEcomStore from "../../../store/ecom-store";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -11,7 +11,7 @@ const FilterMenu = ({ selectedCategoryId, setSelectedCategoryId }) => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/category", {
+                const res = await axiosInstance.get("/category", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setCategories(res.data.categories);

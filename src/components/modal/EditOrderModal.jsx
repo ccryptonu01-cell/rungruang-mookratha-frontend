@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
@@ -8,7 +8,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
     useEffect(() => {
         const fetchMenus = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/menu");
+                const res = await axiosInstance.get("/menu");
                 setMenuList(res.data.menus);
             } catch (err) {
                 console.error("โหลดเมนูล้มเหลว", err);
@@ -68,7 +68,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 })),
                 totalPrice: total
             };
-            await axios.put(`http://localhost:5000/api/admin/orders/detail/${order.id}`, payload, {
+            await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             onClose();

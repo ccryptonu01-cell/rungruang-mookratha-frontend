@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { UtensilsCrossed } from "lucide-react";
 import useEcomStore from "../../../store/ecom-store";
 import { toast } from "react-toastify";
@@ -19,7 +19,7 @@ const ListMenu = ({ refreshTrigger }) => {
 
     const fetchMenus = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/menu");
+            const res = await axiosInstance.get("/api/menu");
             setMenus(res.data.menus);
         } catch (err) {
             console.error("ดึงข้อมูลเมนูล้มเหลว", err);
@@ -28,7 +28,7 @@ const ListMenu = ({ refreshTrigger }) => {
 
     const fetchCategories = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/admin/category", {
+            const res = await axiosInstance.get("/admin/category", {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCategories(res.data.categories);
@@ -53,7 +53,7 @@ const ListMenu = ({ refreshTrigger }) => {
     const handleDelete = async (id) => {
         if (!window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบเมนูนี้?")) return;
         try {
-            await axios.delete(`http://localhost:5000/api/admin/menu/${id}`, {
+            await axiosInstance.delete(`/admin/menu/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -102,7 +102,7 @@ const ListMenu = ({ refreshTrigger }) => {
             formData.append("description", editDescription);
             if (editImage) formData.append("image", editImage);
 
-            await axios.put(`http://localhost:5000/api/admin/menu/${editMenuId}`, formData, {
+            await axiosInstance.put(`/admin/menu/${editMenuId}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data",

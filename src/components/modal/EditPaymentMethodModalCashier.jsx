@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 
 const EditPaymentMethodModalCashier = ({ order, token, onClose }) => {
@@ -14,8 +14,8 @@ const EditPaymentMethodModalCashier = ({ order, token, onClose }) => {
 
         try {
             setLoading(true);
-            await axios.put(
-                `http://localhost:5000/api/cashier/orders/${order.id}`,
+            await axiosInstance.put(
+                `/cashier/orders/${order.id}`,
                 { paymentMethod: selectedMethod },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

@@ -1,5 +1,4 @@
-import React from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 
 const ManageOrderModalCashier = ({ order, token, onClose, onUpdated }) => {
@@ -7,9 +6,9 @@ const ManageOrderModalCashier = ({ order, token, onClose, onUpdated }) => {
         try {
             const orderId = order.id;
 
-            await axios.put(
-                `http://localhost:5000/api/cashier/orders/${orderId}/payment-status`,
-                { status: newStatus }, // ✅ แก้ตรงนี้
+            await axiosInstance.put(
+                `/cashier/orders/${orderId}/payment-status`,
+                { status: newStatus },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
