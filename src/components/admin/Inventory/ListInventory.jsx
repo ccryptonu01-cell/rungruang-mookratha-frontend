@@ -15,7 +15,7 @@ const ListInventory = ({ refreshTrigger }) => {
 
     const fetchInventory = async () => {
         try {
-            const res = await axiosInstance.get("/api/admin/inventory", {
+            const res = await axiosInstance.get("/admin/inventory", {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
