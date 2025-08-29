@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../utils/axiosInstance";
+import axios from "../../../utils/axiosInstance";
 import useEcomStore from "../../store/ecom-store";
 import EditOrderModal from "../../components/modal/EditOrderModal";
 import EditPaymentMethodModal from "../../components/modal/EditPaymentMethodModal";
