@@ -19,6 +19,7 @@ const TIME_SLOTS = [
 const Reservation = () => {
   const user = useEcomStore((state) => state.user);
   const token = useEcomStore((state) => state.token);
+  const [tableNumberToIdMap, setTableNumberToIdMap] = useState({});
   const navigate = useNavigate();
 
   const [selectedTables, setSelectedTables] = useState([]);
