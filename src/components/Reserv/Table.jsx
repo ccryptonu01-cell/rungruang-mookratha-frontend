@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { CheckCircle, XCircle, Star } from "lucide-react";
 
+const [tableNumberToIdMap, setTableNumberToIdMap] = useState({});
+
 const tableLayout = [
     [1, 2, 3, 4, 5, null, 6],
     [7, 8, 9, 10, 11, null, 12],
@@ -45,10 +47,14 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                 });
 
                 const statusMap = {};
+                const numberToIdMap = {};
+
                 res.data.tables.forEach((table) => {
                     statusMap[table.tableNumber] = table.status;
+                    numberToIdMap[table.tableNumber] = table.id;
                 });
                 setTableStatus(statusMap);
+                setTableNumberToIdMap(numberToIdMap);
             } catch (err) {
                 console.error("โหลดสถานะโต๊ะล้มเหลว:", err);
             }
@@ -77,7 +83,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                     if (cell === null) return <div key={`empty-${index}`} />;
 
                     const status = tableStatus[cell];
-                    const isSelected = selectedTables.includes(cell);
+                    const isSelected = selectedTables.includes(tableNumberToIdMap[cell]);
 
                     const bgColor =
                         status === "RESERVED" || status === "OCCUPIED"
@@ -97,8 +103,10 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                         <div
                             key={cell}
                             onClick={() =>
-                                (status === "AVAILABLE" || !status) && toggleTable(cell)
+                                (status === "AVAILABLE" || !status) &&
+                                toggleTable(tableNumberToIdMap[cell])
                             }
+
                             className={`w-full aspect-square flex flex-col items-center justify-center rounded-lg cursor-pointer text-white font-semibold border shadow-sm
                 ${bgColor} hover:scale-105 transition-transform duration-150`}
                             title={`โต๊ะ ${cell} - ${getStatusLabel(status)}`}

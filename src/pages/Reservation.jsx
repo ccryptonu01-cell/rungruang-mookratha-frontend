@@ -80,6 +80,8 @@ const Reservation = () => {
       return;
     }
 
+    console.log('selectedTables', selectedTables)
+
     const payload = {
       startTime: selectedDateTimeStr,
       people: form.people,
