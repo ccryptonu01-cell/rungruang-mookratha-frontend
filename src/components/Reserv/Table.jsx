@@ -47,7 +47,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumbe
                 const endpoint = isGuest ? "/reservations/tables" : "/user/tables";
                 const headers = isGuest ? {} : { Authorization: `Bearer ${token}` };
 
-                const selectedTime = selectedDateTime.toISOString().split('.')[0];
+                const selectedTime = selectedDateTime.toISOString();
 
                 const res = await axiosInstance.get(endpoint, {
                     params: { selectedTime },
