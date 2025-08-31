@@ -82,7 +82,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                     if (cell === null) return <div key={`empty-${index}`} />;
 
                     const status = tableStatus[cell];
-                    const isSelected = selectedTables.includes(tableNumberToIdMap[cell]);
+                    const isSelected = selectedTables.includes(cell);
 
                     const bgColor =
                         status === "RESERVED" || status === "OCCUPIED"
