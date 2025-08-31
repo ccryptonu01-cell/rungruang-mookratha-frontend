@@ -52,21 +52,10 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumbe
                 const endpoint = isGuest ? "/reservations/tables" : "/user/tables";
                 const headers = isGuest ? {} : { Authorization: `Bearer ${token}` };
 
-                const selectedTime = (() => {
-                    try {
-                        const dateObj = new Date(selectedDateTime);
-                        if (isNaN(dateObj.getTime())) throw new Error("Invalid Date");
-                        return dateObj.toISOString();
-                    } catch {
-                        console.warn("⚠️ selectedDateTime แปลงเป็น ISO ไม่ได้:", selectedDateTime);
-                        return null;
-                    }
-                })();
-
-                const encodedTime = encodeURIComponent(selectedDateTime.toISOString());
+                const selectedTime = selectedDateTime.toISOString();
 
                 const res = await axiosInstance.get(endpoint, {
-                    params: { selectedTime: encodedTime },
+                    params: { selectedTime },
                     headers,
                 });
 
