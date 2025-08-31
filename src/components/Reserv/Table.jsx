@@ -54,6 +54,11 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                 });
                 setTableStatus(statusMap);
                 setTableNumberToIdMap(numberToIdMap);
+
+                if (typeof setTableNumberToIdMap === "function") {
+                    setTableNumberToIdMap(numberToIdMap);
+                }
+
             } catch (err) {
                 console.error("โหลดสถานะโต๊ะล้มเหลว:", err);
             }
