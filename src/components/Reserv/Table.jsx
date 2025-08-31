@@ -29,9 +29,6 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
     const [tableStatus, setTableStatus] = useState({});
     const [tableMap, setTableMap] = useState({});
 
-    console.log("🚀 Payload ที่จะส่งไปจอง:", payload);
-    console.log("🪑 โต๊ะที่เลือก:", selectedTables); // ควรเป็น [30003, 30004]
-
     useEffect(() => {
         let intervalId;
 
@@ -106,9 +103,12 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                     return (
                         <div
                             key={cell}
-                            onClick={() =>
-                                (status === "AVAILABLE" || !status) && toggleTable(cell)
-                            }
+                            onClick={() => {
+                                if (table && (status === "AVAILABLE" || !status)) {
+                                    console.log("✅ กดเลือกโต๊ะ id:", table.id, " (เลขโต๊ะ:", table.tableNumber, ")");
+                                    toggleTable(table.id);
+                                }
+                            }}
                             className={`w-full aspect-square flex flex-col items-center justify-center rounded-lg cursor-pointer text-white font-semibold border shadow-sm
                 ${bgColor} hover:scale-105 transition-transform duration-150`}
                             title={`โต๊ะ ${cell} - ${getStatusLabel(status)}`}

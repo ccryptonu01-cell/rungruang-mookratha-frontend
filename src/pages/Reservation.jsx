@@ -89,6 +89,10 @@ const Reservation = () => {
         : {}),
     };
 
+    console.log("🧾 payload ที่จะส่งไป:", payload);
+console.log("🪑 selectedTables:", selectedTables);
+console.log("📅 เวลาเริ่ม:", selectedDateTimeStr);
+
     const endpoint = isGuest
       ? "/reservations"
       : "/user/reservations";
@@ -108,6 +112,7 @@ const Reservation = () => {
       }, 1500);
     } catch (err) {
       console.error("❌ ส่งข้อมูลล้มเหลว:", err);
+      console.log("📦 error.response?.data:", err?.response?.data);
       toast.error(
         err?.response?.data?.message || "จองไม่สำเร็จ",
         { position: "top-center" }
