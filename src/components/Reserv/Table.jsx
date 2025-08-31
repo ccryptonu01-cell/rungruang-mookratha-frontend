@@ -83,6 +83,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                 {tableLayout.flat().map((cell, index) => {
                     if (cell === null) return <div key={`empty-${index}`} />;
 
+                    const table = tableMap[cell];
                     const status = tableStatus[cell];
                     const isSelected = selectedTables.includes(cell);
 
