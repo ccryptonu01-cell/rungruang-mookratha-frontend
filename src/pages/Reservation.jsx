@@ -117,6 +117,8 @@ const Reservation = () => {
     }
   };
 
+  console.log("✅ DEBUG: selectedTables:", selectedTables);
+  console.log("✅ DEBUG: tableNumberToIdMap:", tableNumberToIdMap);
 
   return (
     <>

@@ -25,9 +25,8 @@ const getStatusLabel = (status) => {
     }
 };
 
-const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
+const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumberToIdMap }) => {
     const [tableStatus, setTableStatus] = useState({});
-    const [tableNumberToIdMap, setTableNumberToIdMap] = useState({});
 
     useEffect(() => {
         let intervalId;
