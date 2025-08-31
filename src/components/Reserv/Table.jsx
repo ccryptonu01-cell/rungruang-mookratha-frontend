@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { CheckCircle, XCircle, Star } from "lucide-react";
 
-const [tableNumberToIdMap, setTableNumberToIdMap] = useState({});
-
 const tableLayout = [
     [1, 2, 3, 4, 5, null, 6],
     [7, 8, 9, 10, 11, null, 12],
@@ -29,6 +27,7 @@ const getStatusLabel = (status) => {
 
 const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
     const [tableStatus, setTableStatus] = useState({});
+    const [tableNumberToIdMap, setTableNumberToIdMap] = useState({});
 
     useEffect(() => {
         let intervalId;
