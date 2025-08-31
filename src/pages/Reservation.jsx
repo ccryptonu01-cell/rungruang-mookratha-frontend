@@ -94,7 +94,7 @@ const Reservation = () => {
     console.log("📅 เวลาเริ่ม:", selectedDateTimeStr);
 
     const endpoint = isGuest
-      ? "/reservations"
+      ? "/guest/reservations"
       : "/user/reservations";
 
     try {
