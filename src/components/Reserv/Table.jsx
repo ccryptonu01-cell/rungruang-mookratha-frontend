@@ -49,7 +49,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumbe
                 const headers = isGuest ? {} : { Authorization: `Bearer ${token}` };
 
                 // 🔐 2. สร้าง ISO string ที่ถูกต้อง
-                const isoTime = selectedDateTime.toISOString();
+                const isoTime = selectedDateTime.toISOString().split('.')[0]; // ตัด .000Z ออก
 
                 const res = await axiosInstance.get(endpoint, {
                     params: {
