@@ -27,6 +27,7 @@ const getStatusLabel = (status) => {
 
 const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
     const [tableStatus, setTableStatus] = useState({});
+    const [tableMap, setTableMap] = useState({});
 
     useEffect(() => {
         let intervalId;
@@ -45,10 +46,16 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                 });
 
                 const statusMap = {};
+                const tableMap = {}; // ใหม่
+
                 res.data.tables.forEach((table) => {
                     statusMap[table.tableNumber] = table.status;
+                    tableMap[table.tableNumber] = table; // เช่น tableMap[3] = { id: 30003, tableNumber: 3, status: 'AVAILABLE' }
                 });
+
                 setTableStatus(statusMap);
+                setTableMap(tableMap);
+
             } catch (err) {
                 console.error("โหลดสถานะโต๊ะล้มเหลว:", err);
             }
