@@ -36,7 +36,6 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumbe
 
         const fetchTables = async () => {
             try {
-                // 🔒 1. ตรวจสอบว่า selectedDateTime เป็น Date ที่ถูกต้อง
                 const isValidDate = selectedDateTime instanceof Date && !isNaN(selectedDateTime.getTime());
                 if (!isValidDate) {
                     console.warn("⛔️ selectedDateTime ไม่ถูกต้อง:", selectedDateTime);
@@ -48,13 +47,10 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumbe
                 const endpoint = isGuest ? "/reservations/tables" : "/user/tables";
                 const headers = isGuest ? {} : { Authorization: `Bearer ${token}` };
 
-                // 🔐 2. สร้าง ISO string ที่ถูกต้อง
-               const isoTime = selectedDateTime.toISOString();
+                const selectedTime = selectedDateTime.toISOString().split('.')[0];
 
                 const res = await axiosInstance.get(endpoint, {
-                    params: {
-                        selectedTime: isoTime, 
-                    },
+                    params: { selectedTime },
                     headers,
                 });
 
