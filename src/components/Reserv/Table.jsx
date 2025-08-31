@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { CheckCircle, XCircle, Star } from "lucide-react";
-import useEcomStore from "../../store/ecom-store";
 
 const tableLayout = [
     [1, 2, 3, 4, 5, null, 6],
@@ -26,52 +25,34 @@ const getStatusLabel = (status) => {
     }
 };
 
-const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumberToIdMap }) => {
+const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
     const [tableStatus, setTableStatus] = useState({});
-    const user = useEcomStore((state) => state.user);
-    const token = useEcomStore((state) => state.token);
 
     useEffect(() => {
         let intervalId;
 
         const fetchTables = async () => {
             try {
-
-                console.log("🧪 selectedDateTime (typeof):", typeof selectedDateTime);
-                console.log("🧪 selectedDateTime:", selectedDateTime);
-                console.log("🧪 toISOString:", selectedDateTime?.toISOString());
-
-                const isValidDate = selectedDateTime instanceof Date && !isNaN(selectedDateTime.getTime());
-                if (!isValidDate) {
-                    console.warn("⛔️ selectedDateTime ไม่ถูกต้อง:", selectedDateTime);
+                if (!selectedDateTime) {
                     setTableStatus({});
                     return;
                 }
 
-                const isGuest = !user?.role || user.role !== "USER";
-                const endpoint = isGuest ? "/reservations/tables" : "/user/tables";
-                const headers = isGuest ? {} : { Authorization: `Bearer ${token}` };
-
-                const selectedTime = selectedDateTime.toISOString();
-
-                const res = await axiosInstance.get(endpoint, {
-                    params: { selectedTime },
-                    headers,
+                const res = await axiosInstance.get("/tables", {
+                    params: {
+                        selectedTime: selectedDateTime.toISOString(),
+                    },
                 });
 
                 const statusMap = {};
-                const numberToIdMap = {};
                 res.data.tables.forEach((table) => {
                     statusMap[table.tableNumber] = table.status;
-                    numberToIdMap[table.tableNumber] = table.id;
                 });
                 setTableStatus(statusMap);
-                setTableNumberToIdMap(numberToIdMap);
             } catch (err) {
                 console.error("โหลดสถานะโต๊ะล้มเหลว:", err);
             }
         };
-
 
         if (selectedDateTime) {
             fetchTables();
@@ -118,7 +99,6 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumbe
                             onClick={() =>
                                 (status === "AVAILABLE" || !status) && toggleTable(cell)
                             }
-
                             className={`w-full aspect-square flex flex-col items-center justify-center rounded-lg cursor-pointer text-white font-semibold border shadow-sm
                 ${bgColor} hover:scale-105 transition-transform duration-150`}
                             title={`โต๊ะ ${cell} - ${getStatusLabel(status)}`}

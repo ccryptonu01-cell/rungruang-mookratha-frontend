@@ -19,7 +19,6 @@ const TIME_SLOTS = [
 const Reservation = () => {
   const user = useEcomStore((state) => state.user);
   const token = useEcomStore((state) => state.token);
-  const [tableNumberToIdMap, setTableNumberToIdMap] = useState({});
   const navigate = useNavigate();
 
   const [selectedTables, setSelectedTables] = useState([]);
@@ -52,18 +51,20 @@ const Reservation = () => {
     form.date && form.timeSlot
       ? (() => {
         const [hour, minute] = form.timeSlot.split(" - ")[0].split(":");
-        const d = new Date(`${form.date}T${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:00`);
-        return d.toISOString();
+        const localISO = `${form.date}T${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:00+07:00`;
+        return localISO;
       })()
       : null;
 
   const selectedDateTimeObj = useMemo(() => {
     if (!form.date || !form.timeSlot) return null;
-
     const [hour, minute] = form.timeSlot.split(" - ")[0].split(":");
-    const isoString = `${form.date}T${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:00+07:00`;
-
-    return new Date(isoString);
+    const date = new Date(form.date);
+    date.setHours(parseInt(hour));
+    date.setMinutes(parseInt(minute));
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return date;
   }, [form.date, form.timeSlot]);
 
   const handleSubmit = async () => {
@@ -79,12 +80,10 @@ const Reservation = () => {
       return;
     }
 
-    console.log('selectedTables', selectedTables)
-
     const payload = {
       startTime: selectedDateTimeStr,
       people: form.people,
-      tableIds: selectedTables.map((tableNumber) => tableNumberToIdMap[tableNumber]),
+      tableIds: selectedTables,
       ...(isGuest
         ? { name: form.name, phone: form.phone }
         : {}),
@@ -94,26 +93,36 @@ const Reservation = () => {
       ? "/reservations"
       : "/user/reservations";
 
+    const res = await axios.get(endpoint, payload);
+
     try {
-      const headers = {
-        "Content-Type": "application/json",
-        ...(user?.role === "USER" && token
-          ? { Authorization: `Bearer ${token}` }
-          : {}),
-      };
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(user?.role === "USER" && token
+            ? { Authorization: `Bearer ${token}` }
+            : {}),
+        },
+        body: JSON.stringify(payload),
+      });
 
-      await axios.post(endpoint, payload, { headers });
+      const data = await res.json();
 
-      toast.success("จองโต๊ะสำเร็จ!", { position: "top-center" });
-      setTimeout(() => {
-        navigate(user?.role === "USER" ? "/user" : "/");
-      }, 1500);
+      if (res.ok) {
+        toast.success("จองโต๊ะสำเร็จ!", { position: "top-center" });
+        setTimeout(() => {
+          navigate(user?.role === "USER" ? "/user" : "/");
+        }, 1500);
+      } else {
+        toast.error(data.message || "จองไม่สำเร็จ", { position: "top-center" });
+      }
     } catch (err) {
       console.error("❌ ส่งข้อมูลล้มเหลว:", err);
-      const msg = err?.response?.data?.message || "จองไม่สำเร็จ";
-      toast.error(msg, { position: "top-center" });
+      toast.error("เชื่อมต่อไม่สำเร็จ");
     }
   };
+
 
   return (
     <>
@@ -214,7 +223,6 @@ const Reservation = () => {
             selectedTables={selectedTables}
             toggleTable={toggleTable}
             selectedDateTime={selectedDateTimeObj}
-            setTableNumberToIdMap={setTableNumberToIdMap}
           />
 
           <button
