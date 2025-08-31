@@ -85,7 +85,7 @@ const Reservation = () => {
     const payload = {
       startTime: selectedDateTimeStr,
       people: form.people,
-      tableIds: selectedTables,
+      tableIds: selectedTables.map(number => tableNumberToIdMap[number]),
       ...(isGuest
         ? { name: form.name, phone: form.phone }
         : {}),
