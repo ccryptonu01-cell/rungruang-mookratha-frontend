@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { CheckCircle, XCircle, Star } from "lucide-react";
-import axios from "axios";
 
 const tableLayout = [
     [1, 2, 3, 4, 5, null, 6],
@@ -40,7 +39,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                     return;
                 }
 
-                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/tables`, {
+                const res = await axiosInstance.get("/tables", {
                     params: {
                         selectedTime: selectedDateTime.toISOString(),
                     },
