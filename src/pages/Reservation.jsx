@@ -52,21 +52,18 @@ const Reservation = () => {
     form.date && form.timeSlot
       ? (() => {
         const [hour, minute] = form.timeSlot.split(" - ")[0].split(":");
-        const localISO = `${form.date}T${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:00+07:00`;
-        console.log("📅 selectedDateTimeStr", localISO);
-        return localISO;
+        const d = new Date(`${form.date}T${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:00`);
+        return d.toISOString();
       })()
       : null;
 
   const selectedDateTimeObj = useMemo(() => {
     if (!form.date || !form.timeSlot) return null;
+
     const [hour, minute] = form.timeSlot.split(" - ")[0].split(":");
-    const date = new Date(form.date);
-    date.setHours(parseInt(hour));
-    date.setMinutes(parseInt(minute));
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-    return date;
+    const isoString = `${form.date}T${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:00+07:00`;
+
+    return new Date(isoString);
   }, [form.date, form.timeSlot]);
 
   const handleSubmit = async () => {
