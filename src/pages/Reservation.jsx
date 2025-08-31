@@ -53,6 +53,7 @@ const Reservation = () => {
       ? (() => {
         const [hour, minute] = form.timeSlot.split(" - ")[0].split(":");
         const localISO = `${form.date}T${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:00+07:00`;
+        console.log("📅 selectedDateTimeStr", localISO);
         return localISO;
       })()
       : null;
