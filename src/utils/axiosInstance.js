@@ -7,11 +7,18 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    try {
+      const rawStore = localStorage.getItem('ecom-store');
+      const parsedStore = rawStore ? JSON.parse(rawStore) : null;
+      const token = parsedStore?.state?.token;
 
-    if (token && token !== "null") {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
+      if (token && token !== "null") {
+        config.headers.Authorization = `Bearer ${token}`;
+      } else {
+        delete config.headers.Authorization;
+      }
+    } catch (err) {
+      console.error("⚠️ Failed to parse ecom-store from localStorage", err);
       delete config.headers.Authorization;
     }
 
@@ -19,6 +26,5 @@ instance.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
 
 export default instance;
