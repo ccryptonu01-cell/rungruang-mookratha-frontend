@@ -29,6 +29,9 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
     const [tableStatus, setTableStatus] = useState({});
     const [tableMap, setTableMap] = useState({});
 
+    console.log("🚀 Payload ที่จะส่งไปจอง:", payload);
+    console.log("🪑 โต๊ะที่เลือก:", selectedTables); // ควรเป็น [30003, 30004]
+
     useEffect(() => {
         let intervalId;
 
