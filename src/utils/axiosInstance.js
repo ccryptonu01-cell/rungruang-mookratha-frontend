@@ -13,6 +13,9 @@ instance.interceptors.request.use(
     } else {
       delete config.headers.Authorization;
     }
+
+    console.log(config.headers.Authorization)
+
     return config;
   },
   (error) => Promise.reject(error)
