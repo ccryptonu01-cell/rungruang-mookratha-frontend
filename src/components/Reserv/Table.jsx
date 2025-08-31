@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { CheckCircle, XCircle, Star } from "lucide-react";
+import useEcomStore from "../../store/ecom-store";
 
 const tableLayout = [
     [1, 2, 3, 4, 5, null, 6],
@@ -27,6 +28,8 @@ const getStatusLabel = (status) => {
 
 const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumberToIdMap }) => {
     const [tableStatus, setTableStatus] = useState({});
+    const user = useEcomStore((state) => state.user);
+    const token = useEcomStore((state) => state.token);
 
     useEffect(() => {
         let intervalId;
@@ -38,26 +41,30 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumbe
                     return;
                 }
 
-                const res = await axiosInstance.get("/tables", {
+                const isGuest = !user?.role || user.role !== "USER";
+                const endpoint = isGuest
+                    ? "/reservations/tables"
+                    : "/user/tables";
+
+                const headers = isGuest
+                    ? {}
+                    : { Authorization: `Bearer ${token}` };
+
+                const res = await axiosInstance.get(endpoint, {
                     params: {
                         selectedTime: selectedDateTime.toISOString(),
                     },
+                    headers,
                 });
 
                 const statusMap = {};
                 const numberToIdMap = {};
-
                 res.data.tables.forEach((table) => {
                     statusMap[table.tableNumber] = table.status;
                     numberToIdMap[table.tableNumber] = table.id;
                 });
                 setTableStatus(statusMap);
                 setTableNumberToIdMap(numberToIdMap);
-
-                if (typeof setTableNumberToIdMap === "function") {
-                    setTableNumberToIdMap(numberToIdMap);
-                }
-
             } catch (err) {
                 console.error("โหลดสถานะโต๊ะล้มเหลว:", err);
             }
