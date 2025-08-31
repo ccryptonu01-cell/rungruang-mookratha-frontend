@@ -85,7 +85,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
 
                     const table = tableMap[cell];
                     const status = tableStatus[cell];
-                    const isSelected = selectedTables.includes(cell);
+                    const isSelected = selectedTables.includes(table?.id);
 
                     const bgColor =
                         status === "RESERVED" || status === "OCCUPIED"
@@ -112,10 +112,10 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                             }}
                             className={`w-full aspect-square flex flex-col items-center justify-center rounded-lg cursor-pointer text-white font-semibold border shadow-sm
                 ${bgColor} hover:scale-105 transition-transform duration-150`}
-                            title={`โต๊ะ ${cell} - ${getStatusLabel(status)}`}
+                            title={`โต๊ะ ${table?.tableNumber ?? cell} - ${getStatusLabel(status)}`}
                         >
                             <Icon className="w-6 h-6 mb-1" />
-                            {cell}
+                            {table?.tableNumber ?? cell}
                         </div>
                     );
                 })}
