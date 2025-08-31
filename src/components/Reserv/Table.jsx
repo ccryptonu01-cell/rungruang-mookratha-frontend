@@ -63,8 +63,10 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumbe
                     }
                 })();
 
+                const encodedTime = encodeURIComponent(selectedDateTime.toISOString());
+
                 const res = await axiosInstance.get(endpoint, {
-                    params: { selectedTime },
+                    params: { selectedTime: encodedTime },
                     headers,
                 });
 
