@@ -93,36 +93,27 @@ const Reservation = () => {
       ? "/reservations"
       : "/user/reservations";
 
-    const res = await axios.get(endpoint, payload);
-
     try {
-      const res = await fetch(endpoint, {
-        method: "POST",
+      const res = await axios.post(endpoint, payload, {
         headers: {
-          "Content-Type": "application/json",
           ...(user?.role === "USER" && token
             ? { Authorization: `Bearer ${token}` }
             : {}),
         },
-        body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("จองโต๊ะสำเร็จ!", { position: "top-center" });
-        setTimeout(() => {
-          navigate(user?.role === "USER" ? "/user" : "/");
-        }, 1500);
-      } else {
-        toast.error(data.message || "จองไม่สำเร็จ", { position: "top-center" });
-      }
+      toast.success("จองโต๊ะสำเร็จ!", { position: "top-center" });
+      setTimeout(() => {
+        navigate(user?.role === "USER" ? "/user" : "/");
+      }, 1500);
     } catch (err) {
       console.error("❌ ส่งข้อมูลล้มเหลว:", err);
-      toast.error("เชื่อมต่อไม่สำเร็จ");
+      toast.error(
+        err?.response?.data?.message || "จองไม่สำเร็จ",
+        { position: "top-center" }
+      );
     }
-  };
-
+  }
 
   return (
     <>
