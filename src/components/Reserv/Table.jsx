@@ -36,23 +36,24 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumbe
 
         const fetchTables = async () => {
             try {
-                if (!selectedDateTime) {
+                // 🔒 1. ตรวจสอบว่า selectedDateTime เป็น Date ที่ถูกต้อง
+                const isValidDate = selectedDateTime instanceof Date && !isNaN(selectedDateTime.getTime());
+                if (!isValidDate) {
+                    console.warn("⛔️ selectedDateTime ไม่ถูกต้อง:", selectedDateTime);
                     setTableStatus({});
                     return;
                 }
 
                 const isGuest = !user?.role || user.role !== "USER";
-                const endpoint = isGuest
-                    ? "/reservations/tables"
-                    : "/user/tables";
+                const endpoint = isGuest ? "/reservations/tables" : "/user/tables";
+                const headers = isGuest ? {} : { Authorization: `Bearer ${token}` };
 
-                const headers = isGuest
-                    ? {}
-                    : { Authorization: `Bearer ${token}` };
+                // 🔐 2. สร้าง ISO string ที่ถูกต้อง
+                const isoTime = selectedDateTime.toISOString();
 
                 const res = await axiosInstance.get(endpoint, {
                     params: {
-                        selectedTime: selectedDateTime.toISOString(),
+                        selectedTime: isoTime, 
                     },
                     headers,
                 });
@@ -69,6 +70,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime, setTableNumbe
                 console.error("โหลดสถานะโต๊ะล้มเหลว:", err);
             }
         };
+
 
         if (selectedDateTime) {
             fetchTables();
