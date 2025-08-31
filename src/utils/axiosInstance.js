@@ -7,23 +7,17 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    // ดึง ecom-store จาก localStorage
-    const rawStore = localStorage.getItem('ecom-store');
-
     let token = null;
-    if (rawStore) {
-      try {
-        const parsedStore = JSON.parse(rawStore);
-        const state = JSON.parse(parsedStore.state);
-        token = state.token;
-      } catch (err) {
-        console.error("❌ Error parsing ecom-store:", err);
-      }
+
+    try {
+      const raw = localStorage.getItem('ecom-store');
+      const parsed = JSON.parse(raw);
+      token = parsed?.state?.token || null;
+    } catch (err) {
+      console.error('❌ Failed to parse ecom-store from localStorage:', err);
     }
 
-    console.log("🔑 Extracted token:", token);
-
-    if (token && token !== "null") {
+    if (token && token !== 'null') {
       config.headers.Authorization = `Bearer ${token}`;
     } else {
       delete config.headers.Authorization;
