@@ -102,8 +102,7 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                         <div
                             key={cell}
                             onClick={() =>
-                                (status === "AVAILABLE" || !status) &&
-                                toggleTable(tableNumberToIdMap[cell])
+                                (status === "AVAILABLE" || !status) && toggleTable(cell)
                             }
 
                             className={`w-full aspect-square flex flex-col items-center justify-center rounded-lg cursor-pointer text-white font-semibold border shadow-sm

@@ -85,7 +85,7 @@ const Reservation = () => {
     const payload = {
       startTime: selectedDateTimeStr,
       people: form.people,
-      tableIds: selectedTables.map(number => tableNumberToIdMap[number]),
+      tableIds: selectedTables.map((tableNumber) => tableNumberToIdMap[tableNumber]),
       ...(isGuest
         ? { name: form.name, phone: form.phone }
         : {}),
@@ -216,6 +216,7 @@ const Reservation = () => {
             selectedTables={selectedTables}
             toggleTable={toggleTable}
             selectedDateTime={selectedDateTimeObj}
+            setTableNumberToIdMap={setTableNumberToIdMap}
           />
 
           <button
