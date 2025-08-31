@@ -90,8 +90,8 @@ const Reservation = () => {
     };
 
     console.log("🧾 payload ที่จะส่งไป:", payload);
-console.log("🪑 selectedTables:", selectedTables);
-console.log("📅 เวลาเริ่ม:", selectedDateTimeStr);
+    console.log("🪑 selectedTables:", selectedTables);
+    console.log("📅 เวลาเริ่ม:", selectedDateTimeStr);
 
     const endpoint = isGuest
       ? "/reservations"
