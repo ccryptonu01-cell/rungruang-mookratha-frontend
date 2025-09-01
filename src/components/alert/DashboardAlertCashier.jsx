@@ -23,7 +23,6 @@ const DashboardAlertCashier = () => {
                 } else if (Array.isArray(data.orders)) {
                     setUnpaidOrders(data.orders);
                 } else {
-                    console.warn("⚠️ API response format ผิด:", data);
                     setUnpaidOrders([]);
                 }
             } catch (err) {

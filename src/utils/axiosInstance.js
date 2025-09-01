@@ -6,15 +6,12 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-  console.log("➡️ URL:", config.url);
-  console.log("➡️ Authorization header:", config.headers.Authorization);
 
   // ✅ 1. ไม่แนบ token สำหรับ path guest, g-menu, g-category
   const guestSafePaths = [/\/guest\//, /\/g-menu/, /\/g-category/];
   const isGuestPath = guestSafePaths.some((regex) => regex.test(config.url));
 
   if (isGuestPath) {
-    console.log("🟨 Guest-safe path ตรวจพบ:", config.url);
     return config; // ✅ ไม่แนบ token
   }
 

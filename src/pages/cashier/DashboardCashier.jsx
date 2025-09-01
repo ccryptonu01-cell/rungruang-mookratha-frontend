@@ -47,7 +47,6 @@ const Dashboard = () => {
       } else if (Array.isArray(data.reservations)) {
         setReservations(data.reservations);
       } else {
-        console.warn("⚠️ res.data ไม่ใช่ array:", data);
         setReservations([]); // fallback
       }
     } catch (err) {

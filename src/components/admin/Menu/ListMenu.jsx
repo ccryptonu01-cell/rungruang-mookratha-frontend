@@ -43,7 +43,6 @@ const ListMenu = ({ refreshTrigger }) => {
         fetchMenus();
 
         if (!token) {
-            console.warn("❌ ไม่มี token ห้ามเรียกหมวดหมู่");
             return;
         }
 

@@ -106,7 +106,6 @@ const TableMap = ({ selectedTables, toggleTable, selectedDateTime }) => {
                             key={cell}
                             onClick={() => {
                                 if (table && (status === "AVAILABLE" || !status)) {
-                                    console.log("✅ กดเลือกโต๊ะ id:", table.id, " (เลขโต๊ะ:", table.tableNumber, ")");
                                     toggleTable(table.id);
                                 }
                             }}
