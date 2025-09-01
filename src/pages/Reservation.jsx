@@ -205,7 +205,7 @@ const Reservation = () => {
 
           {selectedTables.length > 0 && (
             <div className="text-base md:text-lg font-semibold text-green-700 bg-green-100 p-3 rounded-md mb-2 text-center">
-              คุณเลือกโต๊ะ: {selectedTables.join(", ")}
+              คุณเลือกโต๊ะ: {selectedTables.map(id => id % 10000).join(", ")}
             </div>
           )}
 
