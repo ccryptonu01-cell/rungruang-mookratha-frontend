@@ -64,7 +64,7 @@ const FormMenu = ({ onAddSuccess }) => {
         formData.append("categoryId", parseInt(categoryId)); // ✅ ตรงนี้สำคัญมาก
 
         try {
-            await axiosInstance.post("/admin/menu", formData, {
+            await axiosInstance.post("/menu", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${token}`,
