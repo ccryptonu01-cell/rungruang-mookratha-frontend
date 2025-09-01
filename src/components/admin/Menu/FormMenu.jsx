@@ -34,7 +34,7 @@ const FormMenu = ({ onAddSuccess }) => {
         };
 
         fetchCategories();
-    }, [hasHydrated, token]); 
+    }, [hasHydrated, token]);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -61,7 +61,7 @@ const FormMenu = ({ onAddSuccess }) => {
         formData.append("price", price);
         formData.append("description", description);
         formData.append("image", image);
-        formData.append("categoryId", parseInt(categoryId)); // ✅ ตรงนี้สำคัญมาก
+        formData.append("categoryId", parseInt(categoryId));
 
         try {
             await axiosInstance.post("/menu", formData, {
