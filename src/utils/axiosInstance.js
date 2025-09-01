@@ -6,12 +6,15 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-  // ✅ 1. ถ้า path ขึ้นต้นด้วย "/guest/" → ห้ามแนบ token
-  if (config.url && config.url.startsWith("/guest/")) {
-    return config; // ออกทันที ไม่ทำอะไรเพิ่ม
+
+  console.log("➡️ URL:", config.url);
+  console.log("➡️ Authorization header:", config.headers.Authorization);
+
+  if (/^\/guest\//.test(config.url)) {
+    console.log("⛔ ไม่แนบ token เพราะเป็น guest route:", config.url);
+    return config;
   }
 
-  // ✅ 2. สำหรับ user ที่ login → แนบ token
   const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

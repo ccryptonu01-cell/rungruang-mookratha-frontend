@@ -98,13 +98,7 @@ const Reservation = () => {
       : "/user/reservations";
 
     try {
-      const res = await axios.post(endpoint, payload, {
-        headers: {
-          ...(user?.role === "USER" && token
-            ? { Authorization: `Bearer ${token}` }
-            : {}),
-        },
-      });
+      const res = await axios.post(endpoint, payload);
 
       toast.success("จองโต๊ะสำเร็จ!", { position: "top-center" });
       setTimeout(() => {
