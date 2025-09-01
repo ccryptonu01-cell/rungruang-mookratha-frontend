@@ -27,7 +27,7 @@ const GuestMyResev = () => {
     }
 
     try {
-      const res = await axios.post("/reservations/guest-check", form);
+      const res = await axios.post("/guest/reservations/guest-check", form);
 
       const data = res.data;
 
@@ -43,7 +43,7 @@ const GuestMyResev = () => {
     if (!confirmCancel) return;
 
     try {
-      const res = await axios.put(`/reservations/${reservationId}/cancel`);
+      const res = await axios.put(`/guest/reservations/${reservationId}/cancel`);
 
       const data = res.data;
 

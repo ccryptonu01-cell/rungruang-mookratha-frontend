@@ -1,30 +1,23 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 30000,
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
+  withCredentials: false,
 });
 
-instance.interceptors.request.use(
-  (config) => {
-    try {
-      const rawStore = localStorage.getItem('ecom-store');
-      const parsedStore = rawStore ? JSON.parse(rawStore) : null;
-      const token = parsedStore?.state?.token;
-
-      if (token && token !== "null") {
-        config.headers.Authorization = `Bearer ${token}`;
-      } else {
-        delete config.headers.Authorization;
-      }
-    } catch (err) {
-      console.error("⚠️ Failed to parse ecom-store from localStorage", err);
-      delete config.headers.Authorization;
-    }
-
+instance.interceptors.request.use((config) => {
+  if (config.url && config.url.startsWith("/guest/")) {
     return config;
-  },
-  (error) => Promise.reject(error)
-);
+  }
+
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
 
 export default instance;
