@@ -10,7 +10,7 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
     useEffect(() => {
         const fetchMenus = async () => {
             try {
-                const res = await axiosInstance.get("/menu");
+                const res = await axiosInstance.get("/cashier/menu");
                 setMenus(res.data.menus || []);
             } catch (err) {
                 console.error("ดึงเมนูล้มเหลว", err);

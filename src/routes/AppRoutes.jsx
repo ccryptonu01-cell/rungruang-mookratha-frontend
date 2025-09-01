@@ -19,7 +19,6 @@ import Dashboard from "../pages/admin/Dashboard"
 import MenuAdmin from '../pages/admin/MenuAdmin'
 import Orders from '../pages/admin/Orders'
 import Reservations from '../pages/admin/Reservations'
-import Inventory from '../pages/admin/Inventory'
 import OrderHistory from '../pages/admin/OrderHistory'
 import ManageUsers from '../pages/admin/ManageUsers'
 
@@ -60,9 +59,9 @@ const AppRoutes = () => {
                     index: true,
                     element: defaultRedirect
                         ? <Navigate to={defaultRedirect} replace />
-                        : <Navigate to="/home" replace /> // ✅ redirect ไป /home
+                        : <Navigate to="/home" replace />
                 },
-                { path: 'home', element: <Home /> }, // ✅ เพิ่ม route ให้ /home
+                { path: 'home', element: <Home /> },
                 { path: 'menu', element: <Menu /> },
                 { path: 'login', element: <Login /> },
                 { path: 'register', element: <Register /> },
@@ -85,7 +84,6 @@ const AppRoutes = () => {
                         { path: 'menu', element: <MenuAdmin /> },
                         { path: 'orders', element: <Orders /> },
                         { path: 'reservations', element: <Reservations /> },
-                        { path: 'inventory', element: <Inventory /> },
                         { path: 'order-history', element: <OrderHistory /> },
                         { path: 'manage-users', element: <ManageUsers /> },
                     ]
