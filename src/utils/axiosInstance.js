@@ -10,11 +10,13 @@ instance.interceptors.request.use((config) => {
   console.log("➡️ URL:", config.url);
   console.log("➡️ Authorization header:", config.headers.Authorization);
 
-  if (/^\/guest\//.test(config.url)) {
-    console.log("⛔ ไม่แนบ token เพราะเป็น guest route:", config.url);
-    return config;
+  const isGuestPath = /\/guest\//.test(config.url);
+  if (isGuestPath) {
+    console.log("🟨 Guest path ตรวจพบ:", config.url);
+    return config; // ไม่แนบ token
   }
 
+  // ✅ 2. สำหรับ user ที่ login → แนบ token
   const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
