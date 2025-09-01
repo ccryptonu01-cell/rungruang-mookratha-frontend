@@ -16,7 +16,7 @@ const OrderFood = () => {
   useEffect(() => {
     const fetchMenus = async () => {
       try {
-        const res = await axios.get("/menu");
+        const res = await axios.get("/admin/menu");
         setMenus(res.data.menus);
       } catch (err) {
         console.error("ดึงเมนูล้มเหลว", err);
