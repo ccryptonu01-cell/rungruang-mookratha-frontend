@@ -21,8 +21,8 @@ function MainNav() {
         </div>
 
         {/* โลโก้ตรงกลาง */}
-        <div className="absolute left-1/2 top-1/2 sm:top-1/2 transform -translate-x-1/2 -translate-y-1/2 sm:translate-y-0 z-20">
-          <div className="h-20 w-20 bg-white rounded-full shadow-md border-4 border-yellow-400 flex items-center justify-center">
+        <div className="absolute left-1/2 top-[50%] transform -translate-x-1/2 -translate-y-1/2 z-20">
+          <div className="h-16 w-16 sm:h-20 sm:w-20 bg-white rounded-full shadow-md border-4 border-yellow-400 flex items-center justify-center">
             <img
               src={logo}
               alt="Logo"
