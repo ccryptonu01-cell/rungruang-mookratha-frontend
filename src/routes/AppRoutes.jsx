@@ -37,7 +37,7 @@ import OrderCashier from '../pages/cashier/OrderCashier.jsx'
 import ReservationCashier from '../pages/cashier/ReservationsCashier.jsx'
 import ForgotPasswordPage from '../pages/Auth/ForgotPasswordPage.jsx'
 import ResetPasswordPage from '../pages/Auth/ResetPasswordPage.jsx'
-import ManualPage from "./pages/ManualPage";
+import ManualPage from "../pages/ManualPage.jsx"
 
 const AppRoutes = () => {
     const token = localStorage.getItem("token");
