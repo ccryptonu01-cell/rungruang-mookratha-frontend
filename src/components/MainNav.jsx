@@ -21,26 +21,28 @@ function MainNav() {
         </div>
 
         {/* โลโก้ตรงกลาง */}
-        <div className="h-20 w-20 bg-white rounded-full shadow-md border-4 border-yellow-400 flex items-center justify-center z-20">
-          <img
-            src={logo}
-            alt="Logo"
-            className="h-full w-full object-contain rounded-full"
-          />
+        <div className="absolute left-1/2 top-1/2 sm:top-1/2 transform -translate-x-1/2 -translate-y-1/2 sm:translate-y-0 z-20">
+          <div className="h-20 w-20 bg-white rounded-full shadow-md border-4 border-yellow-400 flex items-center justify-center">
+            <img
+              src={logo}
+              alt="Logo"
+              className="h-full w-full object-contain rounded-full"
+            />
+          </div>
         </div>
 
         {/* ปุ่ม Login / Register */}
         {!user && (
-          <div className="absolute top-4 right-4 flex flex-col sm:flex-row gap-2 sm:gap-3 items-center z-30">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto max-w-xs sm:max-w-none items-center sm:items-center">
             <Link
               to="/register"
-              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base text-center"
+              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full sm:w-auto text-center"
             >
               สมัครสมาชิก
             </Link>
             <Link
               to="/login"
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base text-center"
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full sm:w-auto text-center"
             >
               เข้าสู่ระบบ
             </Link>
