@@ -31,21 +31,22 @@ function MainNav() {
 
         {/* ✅ เฉพาะ Guest เท่านั้นที่เห็นปุ่ม Login / Register */}
         {!user && (
-          <div className="absolute right-4 top-4 sm:top-2 flex flex-col sm:flex-row gap-2 sm:gap-3 items-center sm:items-center w-full max-w-xs sm:w-auto z-10">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-center sm:items-center w-full sm:w-auto max-w-xs sm:max-w-none mx-auto mt-2 sm:mt-0">
             <Link
               to="/register"
-              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full text-center"
+              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full sm:w-auto text-center"
             >
               สมัครสมาชิก
             </Link>
             <Link
               to="/login"
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full text-center"
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full sm:w-auto text-center"
             >
               เข้าสู่ระบบ
             </Link>
           </div>
         )}
+
       </div>
 
       {/* Dropdown Menu (ซ่อนเมื่อ user login แล้ว) */}
