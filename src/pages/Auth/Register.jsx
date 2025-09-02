@@ -63,7 +63,7 @@ const Register = () => {
         <h2 className="text-2xl font-bold text-center mb-6 text-red-500">สมัครสมาชิก</h2>
 
         <div className="mb-4">
-          <label className="block text-sm font-semibold text-red-600 mb-1">Username</label>
+          <label className="block text-sm font-semibold text-red-600 mb-1">Username*</label>
           <input
             type="text"
             name="username"
@@ -76,7 +76,7 @@ const Register = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-semibold text-red-600 mb-1">Email</label>
+          <label className="block text-sm font-semibold text-red-600 mb-1">Email*</label>
           <input
             type="email"
             name="email"
@@ -89,7 +89,7 @@ const Register = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-semibold text-red-600 mb-1">Password</label>
+          <label className="block text-sm font-semibold text-red-600 mb-1">Password*</label>
           <input
             type="password"
             name="password"
@@ -102,7 +102,7 @@ const Register = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-semibold text-red-600 mb-1">Confirm Password</label>
+          <label className="block text-sm font-semibold text-red-600 mb-1">Confirm Password*</label>
           <input
             type="password"
             name="confirmPassword"
@@ -115,7 +115,7 @@ const Register = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-red-600 mb-1">Phone Number</label>
+          <label className="block text-sm font-semibold text-red-600 mb-1">Phone Number*</label>
           <input
             type="tel"
             name="phone"
