@@ -9,6 +9,7 @@ const Menu = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [highlightedId, setHighlightedId] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [sortOrder, setSortOrder] = useState("default");
 
   // โหลดเมนูและหมวดหมู่
   useEffect(() => {
@@ -34,9 +35,21 @@ const Menu = () => {
     fetchCategories();
   }, []);
 
-  // ฟิลเตอร์เมนูจากคำค้นหา
-  const filteredMenus = menus.filter(menu =>
-    menu.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const sortMenus = (menus) => {
+    switch (sortOrder) {
+      case "price-desc":
+        return [...menus].sort((a, b) => b.price - a.price);
+      case "price-asc":
+        return [...menus].sort((a, b) => a.price - b.price);
+      default:
+        return menus;
+    }
+  };
+
+  const filteredMenus = sortMenus(
+    menus.filter(menu =>
+      menu.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
   // แปลงชื่อหมวดหมู่เป็น id ปลอดภัย
@@ -103,6 +116,19 @@ const Menu = () => {
         {/* Main Menu */}
         <main className="flex-1 p-4">
           <h2 className="text-2xl font-bold mb-6 text-black">เมนูอาหาร</h2>
+          <div className="flex justify-end items-center gap-2 mb-4">
+            <label htmlFor="sort" className="text-black font-prompt">จัดเรียง:</label>
+            <select
+              id="sort"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="border text-black px-3 py-1 rounded-md font-prompt"
+            >
+              <option value="default">-- เรียงตามปกติ --</option>
+              <option value="price-desc">ราคามาก → น้อย</option>
+              <option value="price-asc">ราคาน้อย → มาก</option>
+            </select>
+          </div>
           {groupedMenus
             .filter(group =>
               selectedCategoryId === null
@@ -120,7 +146,7 @@ const Menu = () => {
                       key={menu.id}
                       menu={menu}
                       highlighted={highlightedId === menu.id}
-                      showCartButton={false} // ✅ ปิดปุ่มตะกร้า
+                      showCartButton={false}
                     />
                   ))}
                 </div>
