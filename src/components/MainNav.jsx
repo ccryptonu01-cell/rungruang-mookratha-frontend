@@ -31,16 +31,16 @@ function MainNav() {
 
         {/* ✅ เฉพาะ Guest เท่านั้นที่เห็นปุ่ม Login / Register */}
         {!user && (
-          <div className="absolute right-4 flex gap-3 items-center">
+          <div className="absolute right-4 top-2 flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center w-40 sm:w-auto">
             <Link
               to="/register"
-              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base"
+              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base text-center"
             >
               สมัครสมาชิก
             </Link>
             <Link
               to="/login"
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base"
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base text-center"
             >
               เข้าสู่ระบบ
             </Link>
