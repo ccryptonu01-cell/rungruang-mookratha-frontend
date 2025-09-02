@@ -21,7 +21,7 @@ function MainNav() {
         </div>
 
         {/* โลโก้ตรงกลาง */}
-        <div className="absolute left-1/2 top-[50%] transform -translate-x-1/2 -translate-y-1/2 z-20">
+        <div className="absolute top-6 sm:top-1/2 left-1/2 transform -translate-x-1/2 sm:-translate-y-1/2 z-20">
           <div className="h-16 w-16 sm:h-20 sm:w-20 bg-white rounded-full shadow-md border-4 border-yellow-400 flex items-center justify-center">
             <img
               src={logo}
@@ -33,7 +33,7 @@ function MainNav() {
 
         {/* ปุ่ม Login / Register */}
         {!user && (
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto max-w-xs sm:max-w-none items-center sm:items-center">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto max-w-xs sm:max-w-none items-center sm:items-center mt-16 sm:mt-0">
             <Link
               to="/register"
               className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full sm:w-auto text-center"
