@@ -173,7 +173,7 @@ const OrderCashier = () => {
                                 </td>
                                 <td className="border p-2">
                                     {order.slipUrl ? (
-                                        <button onClick={() => setSlipUrl(order.slipUrl)} className="text-blue-700 text-xs underline">ดู</button>
+                                        <button onClick={() => setSlipUrl(order.slipUrl)} className="text-blue-700 text-xs underline">ดูสลิป</button>
                                     ) : "-"}
                                 </td>
                                 <td className="border p-2">
