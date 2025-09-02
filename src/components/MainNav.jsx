@@ -8,7 +8,7 @@ function MainNav() {
   const user = useEcomStore((state) => state.user); // ✅ ตรวจสถานะผู้ใช้
 
   return (
-    <nav className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 shadow-md z-40">
+    <nav className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 shadow-md z-40 pt-4 sm:pt-0">
       <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20 relative">
 
         {/* เมนูสามขีด */}
