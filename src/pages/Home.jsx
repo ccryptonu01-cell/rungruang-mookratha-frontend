@@ -19,17 +19,20 @@ const Home = () => {
   }, [user, hasHydrated, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-10 bg-cover bg-center font-prompt">
-      <div className="bg-black/80 rounded-xl p-6 sm:p-10 text-center text-white space-y-4 w-full max-w-xl sm:max-w-2xl md:max-w-3xl">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold">
-          รุ่งเรืองหมูกระทะ888
-        </h1>
-        <p className="text-base sm:text-lg md:text-xl font-medium">
-          มาตั้งตี้หมูกระทะกัน ที่รุ่งเรืองหมูกระทะ น้ำจิ้มรสเด็ด อร่อยโดนใจ
-        </p>
-        <p className="text-xs sm:text-sm md:text-base border-t border-white/30 pt-2">
-          เปิดทุกวัน จันทร์–อาทิตย์ 16.00น. - 23.00น.
-        </p>
+    <div className="relative min-h-screen bg-cover bg-center font-prompt px-4 sm:px-6 md:px-10">
+      <div className="absolute inset-0 flex flex-col justify-center items-center sm:static sm:flex sm:justify-center sm:items-center h-full sm:h-auto">
+
+        <div className="bg-black/80 rounded-xl p-6 sm:p-10 text-center text-white space-y-4 w-full max-w-xl sm:max-w-2xl md:max-w-3xl">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold">
+            รุ่งเรืองหมูกระทะ888
+          </h1>
+          <p className="text-base sm:text-lg md:text-xl font-medium">
+            มาตั้งตี้หมูกระทะกัน ที่รุ่งเรืองหมูกระทะ น้ำจิ้มรสเด็ด อร่อยโดนใจ
+          </p>
+          <p className="text-xs sm:text-sm md:text-base border-t border-white/30 pt-2">
+            เปิดทุกวัน จันทร์–อาทิตย์ 16.00น. - 23.00น.
+          </p>
+        </div>
       </div>
     </div>
   );
