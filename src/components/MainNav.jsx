@@ -8,7 +8,7 @@ function MainNav() {
   const user = useEcomStore((state) => state.user); // ✅ ตรวจสถานะผู้ใช้
 
   return (
-    <nav className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 shadow-md z-40 pt-4 sm:pt-0">
+    <nav className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 shadow-md z-40">
       <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20 relative">
 
         {/* เมนูสามขีด */}
@@ -31,16 +31,16 @@ function MainNav() {
 
         {/* ✅ เฉพาะ Guest เท่านั้นที่เห็นปุ่ม Login / Register */}
         {!user && (
-          <div className="absolute right-4 top-2 flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center w-40 sm:w-auto">
+          <div className="absolute right-4 top-4 sm:top-2 flex flex-col sm:flex-row gap-2 sm:gap-3 items-center sm:items-center w-full max-w-xs sm:w-auto z-10">
             <Link
               to="/register"
-              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base text-center"
+              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full text-center"
             >
               สมัครสมาชิก
             </Link>
             <Link
               to="/login"
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base text-center"
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full text-center"
             >
               เข้าสู่ระบบ
             </Link>
