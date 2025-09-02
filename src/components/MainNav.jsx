@@ -12,7 +12,7 @@ function MainNav() {
       <div className="max-w-7xl mx-auto px-4 py-4 sm:py-0 flex flex-col sm:flex-row justify-between items-center gap-3 sm:h-20">
 
         {/* เมนูสามขีด (ซ้ายบน) */}
-        <div className="sm:pl-2 self-start sm:self-center">
+        <div className="sm:hidden flex justify-center mt-4">
           <button onClick={() => setIsOpen(!isOpen)} className="text-white focus:outline-none">
             <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
