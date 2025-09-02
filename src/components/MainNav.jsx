@@ -21,7 +21,7 @@ function MainNav() {
         </div>
 
         {/* โลโก้ตรงกลาง */}
-        <div className="flex justify-center items-center mb-4 sm:absolute sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:top-2 h-20 w-20 mx-auto bg-white rounded-full shadow-md border-4 border-yellow-400 z-20">
+        <div className="h-16 w-16 absolute left-1/2 transform -translate-x-1/2 top-2 flex items-center justify-center bg-white rounded-full shadow-md border-4 border-yellow-400">
           <img
             src={logo}
             alt="Logo"
@@ -31,22 +31,21 @@ function MainNav() {
 
         {/* ✅ เฉพาะ Guest เท่านั้นที่เห็นปุ่ม Login / Register */}
         {!user && (
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-center sm:items-center w-full sm:w-auto max-w-xs sm:max-w-none mx-auto mt-2 sm:mt-0">
+          <div className="absolute right-4 flex gap-3 items-center">
             <Link
               to="/register"
-              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full sm:w-auto text-center"
+              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt"
             >
               สมัครสมาชิก
             </Link>
             <Link
               to="/login"
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base w-full sm:w-auto text-center"
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt"
             >
               เข้าสู่ระบบ
             </Link>
           </div>
         )}
-
       </div>
 
       {/* Dropdown Menu (ซ่อนเมื่อ user login แล้ว) */}
