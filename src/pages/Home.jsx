@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // ✅ เพิ่ม Link
 import useEcomStore from "../store/ecom-store";
 
 const Home = () => {
@@ -23,30 +23,42 @@ const Home = () => {
       {/* ✅ กล่องมือถือ */}
       <div className="sm:hidden min-h-screen flex items-center justify-center px-4 bg-cover bg-center font-prompt">
         <div className="bg-black/80 rounded-xl p-6 text-center text-white space-y-4 w-full max-w-md">
-          <h1 className="text-3xl font-extrabold">
-            รุ่งเรืองหมูกระทะ888
-          </h1>
+          <h1 className="text-3xl font-extrabold">รุ่งเรืองหมูกระทะ888</h1>
           <p className="text-base font-medium">
             มาตั้งตี้หมูกระทะกัน ที่รุ่งเรืองหมูกระทะ น้ำจิ้มรสเด็ด อร่อยโดนใจ
           </p>
           <p className="text-xs border-t border-white/30 pt-2">
             เปิดทุกวัน จันทร์–อาทิตย์ 16.00น. - 23.00น.
           </p>
+
+          {/* ✅ ปุ่มคู่มือบนมือถือ */}
+          <Link
+            to="/manual"
+            className="inline-block mt-2 bg-white text-black font-semibold px-4 py-2 rounded-xl shadow hover:bg-gray-200 transition"
+          >
+            คู่มือการใช้งาน
+          </Link>
         </div>
       </div>
 
       {/* ✅ กล่องจอใหญ่ */}
       <div className="hidden sm:flex min-h-screen items-center justify-center px-6 md:px-10 bg-cover bg-center font-prompt">
         <div className="bg-black/80 rounded-xl p-10 text-center text-white space-y-4 w-full max-w-2xl md:max-w-3xl">
-          <h1 className="text-4xl md:text-5xl font-extrabold">
-            รุ่งเรืองหมูกระทะ888
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold">รุ่งเรืองหมูกระทะ888</h1>
           <p className="text-lg md:text-xl font-medium">
             มาตั้งตี้หมูกระทะกัน ที่รุ่งเรืองหมูกระทะ น้ำจิ้มรสเด็ด อร่อยโดนใจ
           </p>
           <p className="text-sm md:text-base border-t border-white/30 pt-2">
             เปิดทุกวัน จันทร์–อาทิตย์ 16.00น. - 23.00น.
           </p>
+
+          {/* ✅ ปุ่มคู่มือบนจอใหญ่ */}
+          <Link
+            to="/manual"
+            className="inline-block mt-2 bg-white text-black font-semibold px-6 py-2 rounded-xl shadow hover:bg-gray-200 transition"
+          >
+            คู่มือการใช้งาน
+          </Link>
         </div>
       </div>
     </>
