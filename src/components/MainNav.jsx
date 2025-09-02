@@ -31,10 +31,10 @@ function MainNav() {
 
         {/* ✅ เฉพาะ Guest เท่านั้นที่เห็นปุ่ม Login / Register */}
         {!user && (
-          <div className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base">
+          <div className="absolute right-4 flex gap-3 items-center">
             <Link
               to="/register"
-              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt"
+              className="bg-white text-red-600 hover:bg-red-100 font-bold py-2 px-4 rounded-xl shadow transition duration-150 font-prompt text-sm sm:text-base"
             >
               สมัครสมาชิก
             </Link>
