@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import useEcomStore from "../store/ecom-store";
 import MainNav from "../components/MainNav";
 import UserNav from "../components/UserNav";
 import TableMap from "../components/Reserv/Table";
 import { toast } from "react-toastify";
 import axios from "../utils/axiosInstance";
+
 
 const TIME_SLOTS = [
   "16:00 - 17:00",
@@ -15,6 +16,9 @@ const TIME_SLOTS = [
   "20:00 - 21:00",
   "21:00 - 22:00",
 ];
+
+const getTodayYMD = () => new Date().toLocaleDateString("en-CA");
+const todayYMD = getTodayYMD();
 
 const Reservation = () => {
   const user = useEcomStore((state) => state.user);
@@ -67,9 +71,48 @@ const Reservation = () => {
     return date;
   }, [form.date, form.timeSlot]);
 
+  // สร้างรายการช่วงเวลาที่เลือกได้จริง (วันนี้ต้องหลังเวลาปัจจุบัน)
+  const availableSlots = useMemo(() => {
+    if (!form.date) return TIME_SLOTS;
+
+    // กันวันที่ย้อนหลัง
+    if (form.date < todayYMD) return [];
+
+    // ถ้าเป็นวันนี้ ให้กรองช่วงเวลาที่เริ่ม “ช้ากว่าเวลาตอนนี้”
+    if (form.date === todayYMD) {
+      const now = new Date();
+      return TIME_SLOTS.filter((slot) => {
+        const [h, m] = slot.split(" - ")[0].split(":").map(Number);
+        const dt = new Date();
+        dt.setHours(h, m, 0, 0);
+        return dt.getTime() > now.getTime();
+      });
+    }
+
+    // อนาคต: ใช้ได้ทั้งหมด
+    return TIME_SLOTS;
+  }, [form.date, todayYMD]);
+
+  // ถ้า timeSlot ที่เลือกไว้ไม่อยู่ใน availableSlots แล้ว ให้ล้างค่า
+  useEffect(() => {
+    if (form.timeSlot && !availableSlots.includes(form.timeSlot)) {
+      setForm((f) => ({ ...f, timeSlot: "" }));
+    }
+  }, [availableSlots, form.timeSlot]);
+
   const handleSubmit = async () => {
     if (!form.date || !form.timeSlot || !form.people || !selectedTables.length || !selectedDateTimeStr) {
       toast.error("กรุณาระบุวันที่ เวลา จำนวนคน และเลือกโต๊ะ");
+      return;
+    }
+
+    if (form.date < todayYMD) {
+      return;
+    }
+    
+    const now = new Date();
+    if (selectedDateTimeObj && selectedDateTimeObj.getTime() <= now.getTime()) {
+      toast.error("เวลาที่เลือกผ่านไปแล้ว");
       return;
     }
 
@@ -133,6 +176,7 @@ const Reservation = () => {
                 name="date"
                 value={form.date}
                 onChange={handleChange}
+                min={todayYMD}
                 className="w-full border border-gray-300 rounded-md px-3 py-2"
               />
             </div>
@@ -146,12 +190,18 @@ const Reservation = () => {
                 className="w-full border border-gray-300 rounded-md px-3 py-2"
               >
                 <option value="">-- เลือกช่วงเวลา --</option>
-                {TIME_SLOTS.map((slot) => (
+                {availableSlots.map((slot) => (
                   <option key={slot} value={slot}>
                     {slot}
                   </option>
                 ))}
               </select>
+              {form.date && form.date === todayYMD && availableSlots.length === 0 && (
+                <p className="text-sm text-red-500 mt-1">เวลาของวันนี้ผ่านหมดแล้ว โปรดเลือกวันถัดไป</p>
+              )}
+              {form.date && form.date < todayYMD && (
+                <p className="text-sm text-red-500 mt-1">ห้ามเลือกวันที่ย้อนหลัง</p>
+              )}
             </div>
 
             {!user?.role && (
