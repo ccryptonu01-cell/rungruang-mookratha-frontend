@@ -11,6 +11,42 @@ const CATEGORY_LABELS = {
     60004: "เบียร์สด",
 };
 
+/** ---------- normalize เมนูให้มี id/name/price/categoryId/categoryName ---------- */
+const normalizeMenu = (m) => {
+    const categoryObj =
+        m?.category && typeof m.category === "object" ? m.category : null;
+
+    const categoryId =
+        (categoryObj && (categoryObj.id ?? categoryObj.categoryId)) ??
+        m?.categoryId ??
+        m?.category_id ??
+        (typeof m?.category === "number" ? m.category : null) ??
+        null;
+
+    const categoryName =
+        (categoryObj &&
+            (categoryObj.name ||
+                categoryObj.title ||
+                categoryObj.label ||
+                categoryObj.nameTH ||
+                categoryObj.name_th)) ||
+        m?.categoryName ||
+        m?.category_name ||
+        m?.categoryTitle ||
+        (typeof m?.category === "string" ? m.category : null) ||
+        (categoryId != null ? CATEGORY_LABELS[Number(categoryId)] : null) ||
+        null;
+
+    return {
+        id: m.id ?? m.menuId ?? m.itemId ?? m._id,
+        name: m.name ?? m.menuName ?? m.title ?? m.itemName,
+        price: Number(m.price ?? m.sellPrice ?? m.unitPrice ?? 0),
+        categoryId,
+        categoryName,
+        _raw: m,
+    };
+};
+
 const AddOrderModal = ({ token, onClose, onSuccess }) => {
     const [menus, setMenus] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -22,44 +58,31 @@ const AddOrderModal = ({ token, onClose, onSuccess }) => {
     useEffect(() => {
         const fetchMenus = async () => {
             try {
-                // Admin ใช้ /menu (ตามโค้ดเดิมของคุณ)
-                const res = await axiosInstance.get("/menu");
-                setMenus(res.data?.menus || []);
+                const res = await axiosInstance.get("/menu", {
+                    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+                });
+                const raw = res.data?.menus ?? res.data?.data ?? res.data ?? [];
+                const normalized = (Array.isArray(raw) ? raw : []).map(normalizeMenu)
+                    // กรองตัวที่ไม่มี id หรือ name ออก
+                    .filter((x) => x.id != null && x.name);
+                setMenus(normalized);
             } catch (err) {
                 console.error("ดึงเมนูล้มเหลว", err);
+                toast.error("ดึงเมนูล้มเหลว");
+                setMenus([]);
             }
         };
         fetchMenus();
-    }, []);
+    }, [token]);
 
-    /** ----- utils: รองรับ category ได้หลายรูปแบบ ----- */
-    const getCatId = (m) =>
-        (m?.category && typeof m.category === "object" && m.category.id) ??
-        m?.categoryId ??
-        m?.category_id ??
-        (typeof m?.category === "number" ? m.category : null) ??
-        null;
+    /** utils ดึงหมวดจากเมนูที่ถูก normalize แล้ว */
+    const getCatId = (m) => m.categoryId ?? null;
+    const getCatName = (m) =>
+        m.categoryName ??
+        (m.categoryId != null ? CATEGORY_LABELS[Number(m.categoryId)] : "อื่นๆ") ??
+        "อื่นๆ";
 
-    const getCatName = (m) => {
-        const fromObject =
-            (m?.category &&
-                typeof m.category === "object" &&
-                (m.category.name || m.category.title || m.category.label)) ||
-            null;
-
-        const fromFlat =
-            m?.categoryName ||
-            m?.category_name ||
-            m?.categoryTitle ||
-            (typeof m?.category === "string" ? m.category : null);
-
-        const id = getCatId(m);
-        const fromMap = id != null ? CATEGORY_LABELS[Number(id)] : null;
-
-        return fromObject || fromFlat || fromMap || "อื่นๆ";
-    };
-
-    /** จัดกลุ่มเมนูตามหมวด */
+    /** กลุ่มตามหมวด */
     const groupsObj = useMemo(() => {
         const g = {};
         for (const m of menus) {
@@ -95,7 +118,7 @@ const AddOrderModal = ({ token, onClose, onSuccess }) => {
         [orderedCats]
     );
 
-    /** กรองด้วยคำค้น */
+    /** ค้นหา */
     const filterBySearch = (list) => {
         if (!search.trim()) return list;
         const q = search.trim().toLowerCase();
@@ -130,7 +153,7 @@ const AddOrderModal = ({ token, onClose, onSuccess }) => {
         0
     );
 
-    /** บันทึก (admin: ยิงไป /admin/orders ด้วย payload เดิมของคุณ) */
+    /** บันทึก (admin: /admin/orders + payload เดิมของคุณ) */
     const handleSave = async () => {
         if (!selectedTableNumber.trim()) {
             toast.warning("กรุณากรอกหมายเลขโต๊ะ");
@@ -154,13 +177,12 @@ const AddOrderModal = ({ token, onClose, onSuccess }) => {
             };
 
             await axiosInstance.post("/admin/orders", payload, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
 
             toast.success("เพิ่มออเดอร์สำเร็จ");
             setSelectedItems([]);
             setSelectedTableNumber("");
-
             onSuccess && onSuccess();
             onClose && onClose();
         } catch (err) {
@@ -184,7 +206,7 @@ const AddOrderModal = ({ token, onClose, onSuccess }) => {
                     </button>
                 </div>
 
-                {/* Body (scroll ได้) */}
+                {/* Body */}
                 <div className="p-6 grid md:grid-cols-2 gap-6 overflow-y-auto">
                     {/* LEFT */}
                     <div className="flex flex-col">
@@ -226,33 +248,56 @@ const AddOrderModal = ({ token, onClose, onSuccess }) => {
                             </div>
                         </div>
 
-                        {/* แยกหมวดเป็นหัวข้อ */}
+                        {/* แสดงรายการ */}
                         <div className="mt-4 flex-1 overflow-y-auto pr-1">
-                            {activeCat === "ทั้งหมด" ? (
-                                orderedCats.map((cat) => {
-                                    const list = filterBySearch(cat.items);
-                                    if (list.length === 0) return null;
-                                    return (
-                                        <div key={cat.key} className="mb-5">
-                                            <div className="sticky top-0 bg-white py-1">
-                                                <h4 className="text-sm font-bold">{cat.name}</h4>
+                            {menus.length === 0 ? (
+                                <p className="text-gray-500 text-sm">ไม่มีเมนู</p>
+                            ) : activeCat === "ทั้งหมด" ? (
+                                orderedCats.length === 0 ? (
+                                    // fallback: ถ้ายังจัดหมวดไม่ได้ ให้แสดงแบบแบน
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        {filterBySearch(menus).map((menu) => (
+                                            <button
+                                                key={menu.id}
+                                                onClick={() => addItem(menu)}
+                                                className="border rounded-lg p-3 text-left hover:bg-gray-50"
+                                            >
+                                                <div className="font-medium">{menu.name}</div>
+                                                <div className="text-xs text-gray-500">
+                                                    {getCatName(menu)}
+                                                </div>
+                                                <div className="mt-1 text-sm">{menu.price}฿</div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    orderedCats.map((cat) => {
+                                        const list = filterBySearch(cat.items);
+                                        if (list.length === 0) return null;
+                                        return (
+                                            <div key={cat.key} className="mb-5">
+                                                <div className="sticky top-0 bg-white py-1">
+                                                    <h4 className="text-sm font-bold">{cat.name}</h4>
+                                                </div>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                    {list.map((menu) => (
+                                                        <button
+                                                            key={menu.id}
+                                                            onClick={() => addItem(menu)}
+                                                            className="border rounded-lg p-3 text-left hover:bg-gray-50"
+                                                        >
+                                                            <div className="font-medium">{menu.name}</div>
+                                                            <div className="text-xs text-gray-500">
+                                                                {cat.name}
+                                                            </div>
+                                                            <div className="mt-1 text-sm">{menu.price}฿</div>
+                                                        </button>
+                                                    ))}
+                                                </div>
                                             </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                {list.map((menu) => (
-                                                    <button
-                                                        key={menu.id}
-                                                        onClick={() => addItem(menu)}
-                                                        className="border rounded-lg p-3 text-left hover:bg-gray-50"
-                                                    >
-                                                        <div className="font-medium">{menu.name}</div>
-                                                        <div className="text-xs text-gray-500">{cat.name}</div>
-                                                        <div className="mt-1 text-sm">{menu.price}฿</div>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    );
-                                })
+                                        );
+                                    })
+                                )
                             ) : (
                                 (() => {
                                     const cat = orderedCats.find((c) => c.name === activeCat);
@@ -272,7 +317,9 @@ const AddOrderModal = ({ token, onClose, onSuccess }) => {
                                                         className="border rounded-lg p-3 text-left hover:bg-gray-50"
                                                     >
                                                         <div className="font-medium">{menu.name}</div>
-                                                        <div className="text-xs text-gray-500">{cat.name}</div>
+                                                        <div className="text-xs text-gray-500">
+                                                            {cat.name}
+                                                        </div>
                                                         <div className="mt-1 text-sm">{menu.price}฿</div>
                                                     </button>
                                                 ))}
