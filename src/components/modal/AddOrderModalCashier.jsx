@@ -2,6 +2,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { toast } from "react-toastify";
 
+/* ✅ เพิ่ม: แมป id -> ชื่อหมวด (ตามตารางของคุณ) */
+const CATEGORY_LABELS = {
+    30001: "ชุดหมูกระทะ",
+    60001: "ชุดผัก",
+    60002: "เมนูอาหาร",
+    60003: "เครื่องดื่ม",
+    60004: "เบียร์สด",
+};
+
 const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
     const [menus, setMenus] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -22,16 +31,36 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
         fetchMenus();
     }, []);
 
-    // ----- utils: รองรับได้ทั้ง category:{id,name} / categoryName / category(string) -----
+    // ----- utils: รองรับได้ทั้ง category:{id,name} / categoryId / category(string) -----
+    /* ✅ แก้: ดึง id ให้ robust รองรับหลายชื่อฟิลด์ */
     const getCatId = (m) =>
-        (m?.category && typeof m.category === "object" && m.category.id) ||
-        m?.categoryId ||
+        (m?.category && typeof m.category === "object" && m.category.id) ??
+        m?.categoryId ??
+        m?.category_id ??
+        (typeof m?.category === "number" ? m.category : null) ??
         null;
-    const getCatName = (m) =>
-        (m?.category && typeof m.category === "object" && m.category.name) ||
-        m?.categoryName ||
-        (typeof m?.category === "string" ? m.category : null) ||
-        "อื่นๆ";
+
+    /* ✅ แก้: ถ้าไม่มีชื่อจาก object/flat ให้ fallback เป็น CATEGORY_LABELS[categoryId] */
+    const getCatName = (m) => {
+        const fromObject =
+            (m?.category &&
+                typeof m.category === "object" &&
+                (m.category.name ||
+                    m.category.title ||
+                    m.category.label)) ||
+            null;
+
+        const fromFlat =
+            m?.categoryName ||
+            m?.category_name ||
+            m?.categoryTitle ||
+            (typeof m?.category === "string" ? m.category : null);
+
+        const id = getCatId(m);
+        const fromMap = id != null ? CATEGORY_LABELS[Number(id)] : null;
+
+        return fromObject || fromFlat || fromMap || "อื่นๆ";
+    };
 
     // กลุ่มเป็นรูป {key, id, name, items:[]}
     const groupsObj = useMemo(() => {
@@ -54,7 +83,6 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
         if (hasId) {
             return arr.sort((a, b) => Number(a.id) - Number(b.id));
         }
-        // ไม่มี id → ใช้ preferredOrder ก่อน แล้วค่อยตามตัวอักษร
         const rank = (name) => {
             const i = preferredOrder.indexOf(name);
             return i === -1 ? 999 : i;
@@ -199,7 +227,6 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
                         {/* แสดง “แยกหมวดเป็นหัวข้อ” */}
                         <div className="mt-4 flex-1 overflow-y-auto pr-1">
                             {activeCat === "ทั้งหมด" ? (
-                                // โหมดทั้งหมด: loop ทีละหมวด พร้อมหัวข้อ
                                 orderedCats.map((cat) => {
                                     const list = filterBySearch(cat.items);
                                     if (list.length === 0) return null;
@@ -225,7 +252,6 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
                                     );
                                 })
                             ) : (
-                                // โหมดเฉพาะหมวด (แสดงหมวดเดียว)
                                 (() => {
                                     const cat = orderedCats.find((c) => c.name === activeCat);
                                     const list = filterBySearch(cat?.items || []);
