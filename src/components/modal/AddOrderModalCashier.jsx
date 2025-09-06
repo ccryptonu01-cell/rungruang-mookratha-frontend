@@ -6,8 +6,6 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
     const [menus, setMenus] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectedTableNumber, setSelectedTableNumber] = useState("");
-
-    // UI states ใหม่
     const [activeCat, setActiveCat] = useState("ทั้งหมด");
     const [search, setSearch] = useState("");
 
@@ -23,14 +21,12 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
         fetchMenus();
     }, []);
 
-    // helper: แยกหมวดหมู่ (รองรับได้ทั้ง menu.category?.name, menu.categoryName, หรือ menu.category เป็นสตริง)
     const getCat = (m) =>
         (m?.category && typeof m.category === "object" && m.category.name) ||
         (typeof m?.category === "string" && m.category) ||
         m?.categoryName ||
         "อื่นๆ";
 
-    // ทำกลุ่มตามหมวด
     const grouped = useMemo(() => {
         const g = {};
         menus.forEach((m) => {
@@ -46,10 +42,8 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
         [grouped]
     );
 
-    // กรองตามแท็บและค้นหา
     const visibleMenus = useMemo(() => {
-        let list =
-            activeCat === "ทั้งหมด" ? menus : (grouped[activeCat] || []);
+        let list = activeCat === "ทั้งหมด" ? menus : grouped[activeCat] || [];
         if (search.trim()) {
             const q = search.trim().toLowerCase();
             list = list.filter(
@@ -109,8 +103,8 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
             toast.success("เพิ่มออเดอร์สำเร็จ");
             setSelectedItems([]);
             setSelectedTableNumber("");
-            if (onOrderAdded) onOrderAdded();
-            if (onClose) onClose();
+            onOrderAdded && onOrderAdded();
+            onClose && onClose();
         } catch (err) {
             console.error("เพิ่มออเดอร์ไม่สำเร็จ", err);
             toast.error("ไม่สามารถเพิ่มออเดอร์ได้");
@@ -119,7 +113,8 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl w-[min(100%,900px)] max-h-[90vh] shadow-lg overflow-hidden">
+            {/* กล่องโมดัล = คอลัมน์ + จำกัดความสูง + ตัดสกรอลล์จากภายนอก */}
+            <div className="bg-white rounded-xl w-[min(100%,950px)] max-h-[90vh] shadow-lg flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="px-6 py-4 border-b flex items-center justify-between">
                     <h2 className="text-lg font-bold">เพิ่มออเดอร์ (แคชเชียร์)</h2>
@@ -132,11 +127,11 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
                     </button>
                 </div>
 
-                {/* Content */}
-                <div className="p-6 grid md:grid-cols-2 gap-6">
-                    {/* ซ้าย: เลือกโต๊ะ + เมนู */}
-                    <div className="flex flex-col min-h-[50vh]">
-                        {/* เลือกโต๊ะ */}
+                {/* Body = พื้นที่สกรอลล์ได้ */}
+                <div className="p-6 grid md:grid-cols-2 gap-6 overflow-y-auto">
+                    {/* ซ้าย: โต๊ะ + หมวด + ค้นหา + รายการเมนู (สกรอลล์ภายในได้อีกชั้น) */}
+                    <div className="flex flex-col">
+                        {/* โต๊ะ */}
                         <div className="mb-4">
                             <label className="block font-semibold mb-1">หมายเลขโต๊ะ:</label>
                             <input
@@ -148,8 +143,8 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
                             />
                         </div>
 
-                        {/* แท็บหมวดหมู่ (เลื่อนซ้ายขวาได้) */}
-                        <div className="sticky top-0 z-10 bg-white pb-2">
+                        {/* หมวด (เลื่อนซ้าย-ขวา) + ค้นหา */}
+                        <div className="sticky top-0 bg-white pb-2 z-10">
                             <div className="flex gap-2 overflow-x-auto no-scrollbar">
                                 {categories.map((c) => (
                                     <button
@@ -170,7 +165,6 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
                                 ))}
                             </div>
 
-                            {/* ค้นหา */}
                             <div className="mt-3">
                                 <input
                                     value={search}
@@ -181,7 +175,7 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
                             </div>
                         </div>
 
-                        {/* รายการเมนู (เลื่อนขึ้นลงได้) */}
+                        {/* รายการเมนู (สกรอลล์แนวตั้ง) */}
                         <div className="mt-4 flex-1 overflow-y-auto pr-1">
                             {visibleMenus.length === 0 ? (
                                 <p className="text-gray-500 text-sm">ไม่พบเมนู</p>
@@ -205,11 +199,11 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
                         </div>
                     </div>
 
-                    {/* ขวา: ตะกร้า */}
-                    <div className="flex flex-col min-h-[50vh]">
+                    {/* ขวา: ตะกร้า (สกรอลล์ได้) */}
+                    <div className="flex flex-col">
                         <h3 className="font-semibold mb-2">
-                            เมนูที่เลือก
-                            <span className="text-gray-500 text-sm ml-2">
+                            เมนูที่เลือก{" "}
+                            <span className="text-gray-500 text-sm">
                                 ({selectedItems.length} รายการ)
                             </span>
                         </h3>
@@ -218,7 +212,6 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
                             {selectedItems.length === 0 && (
                                 <p className="text-gray-500 text-sm">ยังไม่มีเมนูที่เลือก</p>
                             )}
-
                             {selectedItems.map((item) => (
                                 <div
                                     key={item.id}
@@ -252,24 +245,26 @@ const AddOrderModalCashier = ({ token, onClose, onOrderAdded }) => {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </div>
 
-                        {/* สรุปยอด */}
-                        <div className="mt-4 flex items-center justify-between">
-                            <span className="font-bold">ยอดรวม: {total} ฿</span>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={onClose}
-                                    className="bg-gray-300 px-4 py-2 rounded"
-                                >
-                                    ยกเลิก
-                                </button>
-                                <button
-                                    onClick={handleSave}
-                                    className="bg-green-600 text-white px-4 py-2 rounded"
-                                >
-                                    บันทึก
-                                </button>
-                            </div>
+                {/* Footer ติดล่างตลอด (ไม่เลื่อนหนี) */}
+                <div className="px-6 py-3 border-t bg-white sticky bottom-0">
+                    <div className="flex items-center justify-between">
+                        <span className="font-bold">ยอดรวม: {total} ฿</span>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={onClose}
+                                className="bg-gray-300 px-4 py-2 rounded"
+                            >
+                                ยกเลิก
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                className="bg-green-600 text-white px-4 py-2 rounded"
+                            >
+                                บันทึก
+                            </button>
                         </div>
                     </div>
                 </div>
