@@ -58,7 +58,7 @@ const AddOrderModal = ({ token, onClose, onSuccess }) => {
     useEffect(() => {
         const fetchMenus = async () => {
             try {
-                const res = await axiosInstance.get("/menu", {
+                const res = await axiosInstance.get("/admin/menu", {
                     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
                 });
                 const raw = res.data?.menus ?? res.data?.data ?? res.data ?? [];
