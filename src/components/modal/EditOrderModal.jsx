@@ -8,6 +8,37 @@ const toNumber = (v) => {
     return cleaned === "" ? NaN : Number(cleaned);
 };
 
+// หมวดหมู่
+const CATEGORY_MAP = {
+    30001: "ชุดหมูกระทะ",
+    60001: "ชุดผัก",
+    60002: "เมนูอาหาร",
+    60003: "เครื่องดื่ม",
+    60004: "เนื้อ/ซีฟู้ด",
+};
+
+// ลำดับการเรียงหมวด
+const CATEGORY_ORDER = [30001, 60001, 60002, 60004, 60003];
+
+const groupMenusByCategory = (menus) => {
+    const groups = {};
+    for (const menu of menus) {
+        const catId = menu.categoryId;
+        const catName = CATEGORY_MAP[catId] || "ไม่ทราบหมวด";
+        if (!groups[catName]) groups[catName] = [];
+        groups[catName].push(menu);
+    }
+    return groups;
+};
+
+const getSortedCategoryEntries = (menus) => {
+    const grouped = groupMenusByCategory(menus);
+    return CATEGORY_ORDER.map(id => {
+        const name = CATEGORY_MAP[id];
+        return [name, grouped[name] || []];
+    }).filter(([_, menus]) => menus.length > 0);
+};
+
 const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -23,7 +54,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 setMenuList(menus);
 
                 const initial = order.orderItems
-                    .filter(item => item.menu?.id) // ✅ ลบเมนูที่ไม่มี menuId
+                    .filter(item => item.menu?.id) // ✅ ลบเมนูที่ไม่มี id
                     .map((item) => {
                         const menuId = Number(item.menu?.id);
                         const price = toNumber(item.menu?.price ?? item.price);
@@ -94,7 +125,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
         const payload = {
             orderItems: validItems.map(({ menuId, qty, price, name }) => ({
-                menuId: Number.isInteger(menuId) ? menuId : undefined, // ถ้ามี menuId ให้ส่ง ถ้าไม่มีไม่ต้องส่ง
+                menuId: Number.isInteger(menuId) ? menuId : undefined,
                 qty: Number(qty),
                 price: toNumber(price),
                 name,
@@ -118,7 +149,6 @@ const EditOrderModal = ({ order, token, onClose }) => {
         }
     };
 
-
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded shadow-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto">
@@ -126,17 +156,22 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
                 <div className="mb-4">
                     <h3 className="font-semibold">เมนูทั้งหมด:</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                        {menuList.map(menu => (
-                            <button
-                                key={menu.id}
-                                onClick={() => handleAddItem(menu)}
-                                className="border p-1 rounded hover:bg-gray-100 text-left"
-                            >
-                                {menu.name} ({menu.price}฿)
-                            </button>
-                        ))}
-                    </div>
+                    {getSortedCategoryEntries(menuList).map(([category, menus]) => (
+                        <div key={category} className="mb-2">
+                            <h4 className="font-bold mt-2 text-red-600">{category}</h4>
+                            <div className="grid grid-cols-2 gap-2">
+                                {menus.map(menu => (
+                                    <button
+                                        key={menu.id}
+                                        onClick={() => handleAddItem(menu)}
+                                        className="border p-1 rounded hover:bg-gray-100 text-left"
+                                    >
+                                        {menu.name} ({menu.price}฿)
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
                 </div>
 
                 <div>
