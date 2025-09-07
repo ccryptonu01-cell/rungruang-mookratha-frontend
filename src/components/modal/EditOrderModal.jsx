@@ -26,12 +26,11 @@ const EditOrderModal = ({ order, token, onClose }) => {
                     const menuId = Number(item.menuId ?? item.menu?.id);
                     const price = toNumber(item.price ?? item.menu?.price);
                     const name = item.menu?.name || "";
-
                     return { menuId, qty: Number(item.qty) || 1, price, name };
                 });
+
                 setSelectedItems(initial);
                 console.table(initial);
-
             } catch (err) {
                 console.error("โหลดเมนูล้มเหลว", err);
             }
@@ -39,6 +38,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
         fetchMenus();
     }, [order]);
+
 
     const handleQtyChange = (menuId, qty) => {
         const num = parseInt(qty);
@@ -88,6 +88,12 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 name: it.name,
             }));
 
+        const validItems = selectedItems.filter(it =>
+            Number.isInteger(it.menuId) && it.menuId > 0 &&
+            Number.isInteger(it.qty) && it.qty > 0 &&
+            Number.isFinite(toNumber(it.price)) && toNumber(it.price) >= 0
+        );
+
         const invalid = normalized.find((it) =>
             !Number.isInteger(it.menuId) || it.menuId <= 0 ||
             !Number.isInteger(it.qty) || it.qty <= 0 ||
@@ -100,8 +106,14 @@ const EditOrderModal = ({ order, token, onClose }) => {
         }
 
         const payload = {
-            orderItems: normalized.map(({ menuId, qty, price }) => ({ menuId, qty, price })),
-            totalPrice: Number(total),
+            orderItems: validItems.map(({ menuId, qty, price }) => ({
+                menuId,
+                qty,
+                price: toNumber(price),
+            })),
+            totalPrice: validItems.reduce((sum, item) => {
+                return sum + item.qty * toNumber(item.price);
+            }, 0),
         };
 
         try {
