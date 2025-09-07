@@ -86,21 +86,16 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
     const handleSave = async () => {
         const validItems = selectedItems.filter(it =>
-            Number.isInteger(it.menuId) && it.menuId > 0 &&
             Number.isInteger(it.qty) && it.qty > 0 &&
             Number.isFinite(toNumber(it.price)) && toNumber(it.price) >= 0
         );
 
-        if (validItems.length === 0) {
-            alert("ยังไม่ได้เลือกเมนูที่ถูกต้องเพื่อบันทึก");
-            return;
-        }
-
         const payload = {
-            orderItems: validItems.map(({ menuId, qty, price }) => ({
-                menuId,
-                qty,
+            orderItems: validItems.map(({ menuId, qty, price, name }) => ({
+                menuId: Number.isInteger(menuId) ? menuId : undefined, // ✅ ส่ง undefined ถ้าไม่มี
+                qty: Number(qty),
                 price: toNumber(price),
+                name,
             })),
             totalPrice: validItems.reduce((sum, item) =>
                 sum + item.qty * toNumber(item.price), 0
@@ -120,6 +115,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
             alert(err?.response?.data?.message || "แก้ไขคำสั่งซื้อไม่สำเร็จ");
         }
     };
+
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
