@@ -24,15 +24,30 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
     // 2. รอ menuList และ order พร้อมแล้ว ค่อย map
     useEffect(() => {
-        if (!isMenuLoaded || !menuList.length || !order?.orderItems?.length) return;
+        console.log("🟡 useEffect: menuList และ order ถูกเรียกแล้ว");
+        console.log("📦 menuList =", menuList);
+        console.log("🧾 order =", order);
+
+        if (!menuList.length || !order?.orderItems?.length) {
+            console.log("🔴 ข้ามการ map เพราะ menuList หรือ order.orderItems ยังว่าง");
+            return;
+        }
 
         const initial = order.orderItems
             .map(item => {
                 const menuId = Number(item.menuId || item.menu?.id);
-                if (!menuId) return null;
-
                 const existingMenu = menuList.find(m => m.id === menuId);
-                if (!existingMenu) return null;
+
+                console.log("🔍 mapping orderItem:", {
+                    menuId,
+                    item,
+                    existingMenu,
+                });
+
+                if (!menuId || !existingMenu) {
+                    console.warn("⚠️ เมนูไม่ตรง หรือหาไม่เจอใน menuList:", { menuId });
+                    return null;
+                }
 
                 return {
                     menuId,
@@ -43,8 +58,9 @@ const EditOrderModal = ({ order, token, onClose }) => {
             })
             .filter(Boolean);
 
+        console.log("✅ initial selectedItems =", initial);
         setSelectedItems(initial);
-    }, [isMenuLoaded, menuList, order]);
+    }, [menuList, order]);
 
     // แก้จำนวน
     const handleQtyChange = (menuId, qty) => {
