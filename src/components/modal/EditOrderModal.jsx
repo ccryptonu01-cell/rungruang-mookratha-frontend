@@ -37,7 +37,17 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
         const initial = order.orderItems
             .map(item => {
-                const menuId = Number(item.menuId || item.menu?.id);
+                const menuId = item.menuId
+                    ? Number(item.menuId)
+                    : item.menu?.id
+                        ? Number(item.menu.id)
+                        : null;
+
+                if (!menuId) {
+                    console.warn("❌ ไม่พบ menuId ที่ถูกต้อง:", item);
+                    return null;
+                }
+
                 const existingMenu = menuList.find(m => m.id === menuId);
 
                 console.log("🔍 mapping orderItem:", {
@@ -46,21 +56,19 @@ const EditOrderModal = ({ order, token, onClose }) => {
                     existingMenu,
                 });
 
-                if (!menuId || !existingMenu) {
-                    console.warn("⚠️ เมนูไม่ตรง หรือหาไม่เจอใน menuList:", { menuId });
+                if (!existingMenu) {
+                    console.warn("⚠️ หาเมนูไม่เจอใน menuList:", { menuId });
                     return null;
                 }
 
                 return {
                     menuId,
-                    qty: Number(item.qty || 1),
-                    price: Number(existingMenu.price || 0),
+                    qty: Number(item.qty || item.quantity || 1),
+                    price: Number(existingMenu.price || item.price || 0),
                     name: existingMenu.name,
                 };
             })
             .filter(Boolean);
-
-        console.log("✅ initial selectedItems =", initial);
         setSelectedItems(initial);
     }, [menuList, order]);
 
