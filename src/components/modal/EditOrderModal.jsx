@@ -6,9 +6,6 @@ const EditOrderModal = ({ order, token, onClose }) => {
     const [selectedItems, setSelectedItems] = useState([]);
     const [isMenuLoaded, setIsMenuLoaded] = useState(false);
 
-    console.log("📦 order ที่รับมา:", order);
-    console.log("📦 order.orderItems:", order?.orderItems);
-
     if (!order || !order.orderItems) return null;
 
     // โหลดเมนู
@@ -29,23 +26,22 @@ const EditOrderModal = ({ order, token, onClose }) => {
     useEffect(() => {
         if (!menuList.length || !order?.orderItems?.length) return;
 
-        const initial = order.orderItems.map(item => {
-            const menuId = Number(item.menuId || item.menu?.id);
-            if (!menuId) return null;
+        const initial = order.orderItems
+            .map(item => {
+                const menuId = Number(item.menuId || item.menu?.id);
+                if (!menuId) return null;
 
-            const fallbackMenu = menuList.find(m => m.id === menuId);
-            const name = item.menu?.name || fallbackMenu?.name || `เมนู #${menuId}`;
-            const price = Number(
-                fallbackMenu?.price ?? item.price ?? item.menu?.price ?? 0
-            );
+                const existingMenu = menuList.find(m => m.id === menuId);
+                if (!existingMenu) return null; //
 
-            return {
-                menuId,
-                qty: Number(item.qty || 1),
-                price,
-                name,
-            };
-        }).filter(Boolean);
+                return {
+                    menuId,
+                    qty: Number(item.qty || 1),
+                    price: Number(existingMenu.price || 0),
+                    name: existingMenu.name,
+                };
+            })
+            .filter(Boolean);
 
         setSelectedItems(initial);
     }, [menuList, order]);
