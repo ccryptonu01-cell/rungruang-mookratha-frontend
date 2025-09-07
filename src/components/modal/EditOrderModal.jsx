@@ -15,24 +15,25 @@ const EditOrderModal = ({ order, token, onClose }) => {
             }
         };
 
+        fetchMenus();
+    }, []);
+
+    useEffect(() => {
         const initial = order.orderItems
             .filter(item => item.menuId != null)
             .map(item => {
                 const menuId = Number(item.menuId);
-                const menuName = item.menu?.name || ""; 
-                const price = Number(item.price || 0);
-                const qty = Number(item.qty || 1);
+                const fallback = menuList.find(m => m.id === menuId)?.name || "";
                 return {
                     menuId,
-                    qty,
-                    price,
-                    name: menuName,
+                    qty: Number(item.qty || 1),
+                    price: Number(item.price || 0),
+                    name: item.menu?.name || fallback,
                 };
             });
 
         setSelectedItems(initial);
-        fetchMenus();
-    }, [order]);
+    }, [order, menuList]);
 
     const handleQtyChange = (menuId, qty) => {
         const num = parseInt(qty);
