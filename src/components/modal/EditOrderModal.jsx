@@ -6,7 +6,6 @@ import axiosInstance from "../../utils/axiosInstance";
 const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
-    const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
         const fetchMenus = async () => {
@@ -21,7 +20,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
     }, []);
 
     useEffect(() => {
-        if (!order?.orderItems?.length || !menuList.length || initialized) return;
+        if (!order?.orderItems?.length || !menuList.length) return;
 
         const initial = order.orderItems
             .filter(item => item.menuId != null)
@@ -30,6 +29,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 const fallbackMenu = menuList.find(m => m.id === menuId);
                 const name = item.menu?.name || fallbackMenu?.name || `เมนู #${menuId}`;
                 const price = fallbackMenu?.price ?? item.price ?? 0;
+
                 return {
                     menuId,
                     qty: Number(item.qty || 1),
@@ -39,8 +39,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
             });
 
         setSelectedItems(initial);
-        setInitialized(true);
-    }, [order, menuList, initialized]);
+    }, [order, menuList]);
 
     const handleQtyChange = (menuId, qty) => {
         const num = parseInt(qty);
