@@ -104,27 +104,36 @@ const EditOrderModal = ({ order, token, onClose }) => {
     );
 
     const handleSave = async () => {
-        const valid = selectedItems.every((item) => Number.isFinite(+item.qty) && +item.qty >= 1);
+        const valid = selectedItems.every(
+            (item) =>
+                Number.isFinite(+item.menuId) &&
+                Number.isFinite(+item.qty) &&
+                Number.isFinite(+item.price) &&
+                +item.qty >= 1
+        );
+
         if (!valid) {
-            alert("กรุณากรอกจำนวนให้ครบทุกเมนู");
+            alert("กรุณากรอกจำนวนให้ถูกต้อง");
             return;
         }
 
         try {
             const payload = {
                 orderItems: selectedItems.map((i) => ({
-                    menuId: i.menuId,
+                    menuId: Number(i.menuId),
                     qty: Number(i.qty),
                     price: Number(i.price),
                 })),
                 totalPrice: selectedItems.reduce(
                     (sum, i) => sum + Number(i.qty) * Number(i.price || 0),
                     0
-                )
+                ),
             };
 
+            console.log("📦 payload ที่จะส่ง:", payload);
+
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             onClose();
