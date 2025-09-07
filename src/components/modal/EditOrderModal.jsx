@@ -6,6 +6,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
     const [selectedItems, setSelectedItems] = useState([]);
 
     // โหลดเมนูจาก backend
+    // โหลดเมนูจาก backend
     useEffect(() => {
         const fetchMenus = async () => {
             try {
@@ -18,13 +19,15 @@ const EditOrderModal = ({ order, token, onClose }) => {
         fetchMenus();
     }, []);
 
+    // ตั้งค่า selectedItems จาก order
     useEffect(() => {
-        if (!order || !order.orderItems || !menuList.length) return;
+        if (!order?.orderItems?.length || !menuList.length) return;
 
         const initial = order.orderItems
-            .filter(item => item.menuId != null)
             .map(item => {
-                const menuId = Number(item.menuId);
+                const menuId = Number(item.menuId || item.menu?.id);
+                if (!menuId) return null;
+
                 const fallbackMenu = menuList.find(m => m.id === menuId);
                 const name = item.menu?.name || fallbackMenu?.name || `เมนู #${menuId}`;
                 const price = fallbackMenu?.price ?? item.price ?? 0;
@@ -35,10 +38,12 @@ const EditOrderModal = ({ order, token, onClose }) => {
                     price: Number(price),
                     name,
                 };
-            });
+            })
+            .filter(item => item !== null);
 
+        console.log("🟩 ตั้งค่า selectedItems:", initial);
         setSelectedItems(initial);
-    }, [order?.id, menuList]);
+    }, [order, menuList]);
 
     // แก้จำนวน
     const handleQtyChange = (menuId, qty) => {
