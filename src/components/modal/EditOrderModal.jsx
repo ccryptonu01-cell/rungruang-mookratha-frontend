@@ -22,14 +22,13 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 }));
                 setMenuList(menus);
 
-                const initial = order.orderItems
-                    .map(item => {
-                        const menuId = Number(item.menuId ?? item.menu?.id);
-                        const price = toNumber(item.price ?? item.menu?.price);
-                        const name = item.menu?.name || "";
+                const initial = order.orderItems.map(item => {
+                    const menuId = Number(item.menuId ?? item.menu?.id);
+                    const price = toNumber(item.price ?? item.menu?.price);
+                    const name = item.menu?.name || "";
 
-                        return { menuId, qty: Number(item.qty) || 1, price, name };
-                    })
+                    return { menuId, qty: Number(item.qty) || 1, price, name };
+                });
                 setSelectedItems(initial);
                 console.table(initial);
 
@@ -80,12 +79,14 @@ const EditOrderModal = ({ order, token, onClose }) => {
     }, 0);
 
     const handleSave = async () => {
-        const normalized = selectedItems.map(it => ({
-            menuId: Number(it.menuId),
-            qty: Number(it.qty),
-            price: toNumber(it.price),
-            name: it.name,
-        }));
+        const normalized = selectedItems
+            .filter(it => Number.isInteger(it.menuId) && it.menuId > 0) // ✅ กรองเฉพาะที่มี id
+            .map(it => ({
+                menuId: Number(it.menuId),
+                qty: Number(it.qty),
+                price: toNumber(it.price),
+                name: it.name,
+            }));
 
         const invalid = normalized.find((it) =>
             !Number.isInteger(it.menuId) || it.menuId <= 0 ||
