@@ -39,7 +39,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
         setSelectedItems([...selectedItems, {
             menuId: menu.id,
             qty: 1,
-            price: menu.price,
+            price: Number(menu.price || 0),
             name: menu.name
         }]);
     };
@@ -62,11 +62,11 @@ const EditOrderModal = ({ order, token, onClose }) => {
         try {
             const payload = {
                 orderItems: selectedItems.map(item => ({
-                    menuId: item.menuId,
-                    qty: item.qty,
-                    price: item.price 
+                    menuId: Number(item.menuId),
+                    qty: Number(item.qty),
+                    price: Number(item.price)
                 })),
-                totalPrice: total
+                totalPrice: Number(total)
             };
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
