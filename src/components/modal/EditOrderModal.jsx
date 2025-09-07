@@ -21,18 +21,20 @@ const EditOrderModal = ({ order, token, onClose }) => {
                     price: toNumber(m.price),
                 }));
                 setMenuList(menus);
+
+                const initial = order.orderItems.map(item => ({
+                    menuId: Number(item.menuId),
+                    qty: Number(item.qty) || 1,
+                    price: toNumber(item.price),
+                    name: item.menu?.name || ""
+                }));
+                setSelectedItems(initial);
+
             } catch (err) {
                 console.error("โหลดเมนูล้มเหลว", err);
             }
         };
 
-        const initial = order.orderItems.map(item => ({
-            menuId: Number(item.menuId),
-            qty: Number(item.qty) || 1,
-            price: toNumber(item.price),
-            name: item.menu?.name || ""
-        }));
-        setSelectedItems(initial);
         fetchMenus();
     }, [order]);
 
