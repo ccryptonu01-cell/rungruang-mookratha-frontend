@@ -1,7 +1,15 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 
-const CATEGORY_ORDER = ["ชุดหมูกระทะ", "ชุดผัก", "เมนูอาหาร", "เครื่องดื่ม", "เนื้อสัตว์", "อื่น ๆ"];
+// หมวดตามหน้าเมนู (ลำดับที่ต้องการ)
+const CATEGORY_ORDER = ["ชุดหมูกระทะ", "ชุดผัก", "เมนูอาหาร", "เครื่องดื่ม", "เนื้อสัตว์"];
+const CATEGORY_BY_ID = {
+    30001: "ชุดหมูกระทะ",
+    60001: "ชุดผัก",
+    60002: "เมนูอาหาร",
+    60003: "เครื่องดื่ม",
+    60004: "เนื้อสัตว์",
+};
 
 const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
@@ -11,13 +19,13 @@ const EditOrderModal = ({ order, token, onClose }) => {
         const fetchMenus = async () => {
             try {
                 const res = await axiosInstance.get("/admin/menu");
-                setMenuList(res.data.menus);
+                setMenuList(res.data.menus || []);
             } catch (err) {
                 console.error("โหลดเมนูล้มเหลว", err);
             }
         };
 
-        const initial = order.orderItems.map((item) => ({
+        const initial = (order.orderItems || []).map((item) => ({
             menuId: item.menuId,
             qty: item.qty || 1,
             price: item.price,
@@ -27,39 +35,48 @@ const EditOrderModal = ({ order, token, onClose }) => {
         fetchMenus();
     }, [order]);
 
-    // จัดกลุ่มเมนูตามหมวดหมู่ และเรียงตาม CATEGORY_ORDER
-    const groupedMenus = useMemo(() => {
-        const groups = {};
-        for (const menu of menuList || []) {
-            // รองรับหลายรูปแบบ เผื่อ backend ส่งต่างกัน
-            const cat =
-                menu?.category?.name ||
-                menu?.categoryName ||
-                menu?.category ||
-                "อื่น ๆ";
+    // เลือกชื่อหมวดที่ "ตรงกับหน้าเมนูเท่านั้น" (ไม่แมตช์ = ตัดทิ้ง)
+    const resolveCategoryName = (menu) => {
+        // 1) จาก object ตรง ๆ
+        const direct =
+            menu?.category?.name ||
+            menu?.categoryName ||
+            (typeof menu?.category === "string" ? menu.category : null);
+        if (direct && CATEGORY_ORDER.includes(direct)) return direct;
 
-            if (!groups[cat]) groups[cat] = [];
-            groups[cat].push(menu);
+        // 2) จาก id
+        const idCandidate =
+            menu?.categoryId ??
+            menu?.category_id ??
+            menu?.category?.id ??
+            menu?.catId ??
+            menu?.cat_id;
+        const byId = CATEGORY_BY_ID[Number(idCandidate)];
+        if (byId && CATEGORY_ORDER.includes(byId)) return byId;
+
+        // 3) ไม่ตรงหน้าเมนู -> ไม่จัดแสดง
+        return null;
+    };
+
+    // จัดกลุ่มเฉพาะหมวดตามหน้าเมนู และเรียงตาม CATEGORY_ORDER (ไม่มี "อื่น ๆ")
+    const groupedMenus = useMemo(() => {
+        const bucket = {};
+        for (const m of menuList) {
+            const cat = resolveCategoryName(m);
+            if (!cat) continue; // ตัดเมนูที่ไม่อยู่ใน 5 หมวดทิ้ง
+            if (!bucket[cat]) bucket[cat] = [];
+            bucket[cat].push(m);
         }
 
-        // สร้างอ็อบเจ็กต์ตามลำดับหมวดที่กำหนด
-        const sorted = {};
+        const ordered = {};
         CATEGORY_ORDER.forEach((cat) => {
-            if (groups[cat]) {
-                sorted[cat] = groups[cat]
+            if (bucket[cat]?.length) {
+                ordered[cat] = bucket[cat]
                     .slice()
                     .sort((a, b) => (a.name || "").localeCompare(b.name || "", "th"));
             }
         });
-
-        // ถ้ามีหมวดที่ไม่อยู่ในลำดับที่กำหนด ให้ต่อท้าย
-        Object.keys(groups).forEach((cat) => {
-            if (!CATEGORY_ORDER.includes(cat)) {
-                sorted[cat] = groups[cat];
-            }
-        });
-
-        return sorted;
+        return ordered;
     }, [menuList]);
 
     const handleQtyChange = (menuId, qty) => {
@@ -75,14 +92,14 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
     const handleAddItem = (menu) => {
         if (selectedItems.some((item) => item.menuId === menu.id)) return;
-        setSelectedItems([
-            ...selectedItems,
+        setSelectedItems((prev) => [
+            ...prev,
             { menuId: menu.id, qty: 1, price: menu.price, name: menu.name },
         ]);
     };
 
     const handleRemoveItem = (menuId) => {
-        setSelectedItems((prev) => prev.filter((item) => item.menuId !== menuId));
+        setSelectedItems((prev) => prev.filter((i) => i.menuId !== menuId));
     };
 
     const total = selectedItems.reduce(
@@ -96,13 +113,12 @@ const EditOrderModal = ({ order, token, onClose }) => {
             alert("กรุณากรอกจำนวนให้ครบทุกเมนู");
             return;
         }
-
         try {
             const payload = {
-                orderItems: selectedItems.map((item) => ({
-                    menuId: item.menuId,
-                    qty: item.qty,
-                    price: item.price,
+                orderItems: selectedItems.map((i) => ({
+                    menuId: i.menuId,
+                    qty: i.qty,
+                    price: i.price,
                 })),
                 totalPrice: total,
             };
@@ -120,7 +136,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
             <div className="bg-white rounded shadow-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto">
                 <h2 className="text-lg font-bold mb-4">แก้ไขเมนู</h2>
 
-                {/* เมนูทั้งหมด (แยกตามหมวด) */}
+                {/* เมนูทั้งหมด (แยกตามหน้าเมนู และไม่มีหมวดอื่น ๆ) */}
                 <div className="mb-4">
                     <h3 className="font-semibold">เมนูทั้งหมด:</h3>
 
