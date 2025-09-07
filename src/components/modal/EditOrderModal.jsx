@@ -26,51 +26,32 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
     // 2. รอ menuList และ order พร้อมแล้ว ค่อย map
     useEffect(() => {
-        console.log("🟡 useEffect: menuList และ order ถูกเรียกแล้ว");
-        console.log("📦 menuList =", menuList);
-        console.log("🧾 order =", order);
-
-        if (!menuList.length || !order?.orderItems?.length) {
-            console.log("🔴 ข้ามการ map เพราะ menuList หรือ order.orderItems ยังว่าง");
+        if (!order || !menuList || menuList.length === 0) {
+            console.log("🟡 ยังไม่พร้อม map เพราะ menuList ยังว่างอยู่");
             return;
         }
 
-        const initial = order.orderItems
-            .map(item => {
-                const menuId = item.menuId
-                    ? Number(item.menuId)
-                    : item.menu?.id
-                        ? Number(item.menu.id)
-                        : null;
+        const mappedItems = order.orderItems.map((item) => {
+            const menuId = item.menuId ?? item.menu?.id;
+            const existingMenu = menuList.find(m => m.id === Number(menuId));
 
-                if (!menuId) {
-                    console.warn("❌ ไม่พบ menuId ที่ถูกต้อง:", item);
-                    return null;
-                }
+            if (!menuId || !existingMenu) {
+                console.warn("❌ ไม่พบ menuId ที่ถูกต้อง:", item);
+                return null;
+            }
 
-                const existingMenu = menuList.find(m => m.id === menuId);
+            return {
+                menuId: Number(menuId),
+                quantity: item.quantity,
+                price: item.price,
+                menu: existingMenu,
+            };
+        }).filter(Boolean);
 
-                console.log("🔍 mapping orderItem:", {
-                    menuId,
-                    item,
-                    existingMenu,
-                });
-
-                if (!existingMenu) {
-                    console.warn("⚠️ หาเมนูไม่เจอใน menuList:", { menuId });
-                    return null;
-                }
-
-                return {
-                    menuId,
-                    qty: Number(item.qty || item.quantity || 1),
-                    price: Number(existingMenu.price || item.price || 0),
-                    name: existingMenu.name,
-                };
-            })
-            .filter(Boolean);
-        setSelectedItems(initial);
+        setSelectedItems(mappedItems);
+        console.log("✅ initial selectedItems = ", mappedItems);
     }, [menuList, order]);
+
 
     // แก้จำนวน
     const handleQtyChange = (menuId, qty) => {
