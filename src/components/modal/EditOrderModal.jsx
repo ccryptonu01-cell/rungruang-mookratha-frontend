@@ -5,6 +5,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
 
+    // โหลดเมนูทั้งหมด
     useEffect(() => {
         const fetchMenus = async () => {
             try {
@@ -14,16 +15,31 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 console.error("โหลดเมนูล้มเหลว", err);
             }
         };
-
-        const initial = order.orderItems.map(item => ({
-            menuId: item.menuId,
-            qty: item.qty || 1,
-            price: item.price,
-            name: item.menu?.name || ""
-        }));
-        setSelectedItems(initial);
         fetchMenus();
-    }, [order]);
+    }, []);
+
+    // โหลดข้อมูล order เดิม
+    useEffect(() => {
+        if (!order?.orderItems?.length || !menuList.length) return;
+
+        const initial = order.orderItems
+            .filter(item => item.menuId != null)
+            .map(item => {
+                const menuId = Number(item.menuId);
+                const fallbackMenu = menuList.find(m => m.id === menuId);
+                const name = item.menu?.name || fallbackMenu?.name || `เมนู #${menuId}`;
+                const price = fallbackMenu?.price ?? item.price ?? 0;
+
+                return {
+                    menuId,
+                    qty: Number(item.qty || 1),
+                    price: Number(price),
+                    name,
+                };
+            });
+
+        setSelectedItems(initial);
+    }, [order, menuList]);
 
     const handleQtyChange = (menuId, qty) => {
         const num = parseInt(qty);
@@ -39,7 +55,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
         setSelectedItems([...selectedItems, {
             menuId: menu.id,
             qty: 1,
-            price: menu.price,
+            price: Number(menu.price || 0),
             name: menu.name
         }]);
     };
@@ -53,27 +69,36 @@ const EditOrderModal = ({ order, token, onClose }) => {
         , 0);
 
     const handleSave = async () => {
-        const valid = selectedItems.every(item => item.qty && !isNaN(item.qty));
+        const valid = selectedItems.every(item =>
+            Number.isInteger(item.menuId) &&
+            item.menuId > 0 &&
+            item.qty &&
+            !isNaN(item.qty) &&
+            !isNaN(item.price)
+        );
+
         if (!valid) {
-            alert("กรุณากรอกจำนวนให้ครบทุกเมนู");
+            alert("มีรายการที่ไม่สมบูรณ์ กรุณาตรวจสอบเมนูอีกครั้ง");
             return;
         }
 
         try {
             const payload = {
                 orderItems: selectedItems.map(item => ({
-                    menuId: item.menuId,
-                    qty: item.qty,
-                    price: item.price 
+                    menuId: Number(item.menuId),
+                    qty: Number(item.qty),
+                    price: Number(item.price || 0)
                 })),
-                totalPrice: total
+                totalPrice: Number(total)
             };
+
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
             onClose();
         } catch (err) {
-            console.error("อัปเดตเมนูล้มเหลว", err);
+            console.error("❌ อัปเดตเมนูล้มเหลว:", err);
         }
     };
 
@@ -99,20 +124,24 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
                 <div>
                     <h3 className="font-semibold mb-2">เมนูที่เลือก:</h3>
-                    {selectedItems.map(item => (
-                        <div key={item.menuId} className="flex items-center justify-between border-b py-1">
-                            <span>{item.name}</span>
-                            <input
-                                type="number"
-                                min={1}
-                                className="border p-1 w-16 text-right"
-                                value={item.qty}
-                                onChange={e => handleQtyChange(item.menuId, e.target.value)}
-                            />
-                            <span>{isNaN(item.qty * item.price) ? "-" : item.qty * item.price}฿</span>
-                            <button onClick={() => handleRemoveItem(item.menuId)} className="text-red-500 ml-2">ลบ</button>
-                        </div>
-                    ))}
+                    {selectedItems.length === 0 ? (
+                        <p className="text-gray-500">ยังไม่มีเมนูที่เลือก</p>
+                    ) : (
+                        selectedItems.map(item => (
+                            <div key={item.menuId} className="flex items-center justify-between border-b py-1">
+                                <span>{item.name}</span>
+                                <input
+                                    type="number"
+                                    min={1}
+                                    className="border p-1 w-16 text-right"
+                                    value={item.qty}
+                                    onChange={e => handleQtyChange(item.menuId, e.target.value)}
+                                />
+                                <span>{isNaN(item.qty * item.price) ? "-" : item.qty * item.price}฿</span>
+                                <button onClick={() => handleRemoveItem(item.menuId)} className="text-red-500 ml-2">ลบ</button>
+                            </div>
+                        ))
+                    )}
                 </div>
 
                 <div className="mt-4 text-right">
