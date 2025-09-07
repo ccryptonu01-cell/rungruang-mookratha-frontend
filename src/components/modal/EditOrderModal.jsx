@@ -37,14 +37,12 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
     // เลือกชื่อหมวดที่ "ตรงกับหน้าเมนูเท่านั้น" (ไม่แมตช์ = ตัดทิ้ง)
     const resolveCategoryName = (menu) => {
-        // 1) จาก object ตรง ๆ
         const direct =
             menu?.category?.name ||
             menu?.categoryName ||
             (typeof menu?.category === "string" ? menu.category : null);
         if (direct && CATEGORY_ORDER.includes(direct)) return direct;
 
-        // 2) จาก id
         const idCandidate =
             menu?.categoryId ??
             menu?.category_id ??
@@ -54,20 +52,18 @@ const EditOrderModal = ({ order, token, onClose }) => {
         const byId = CATEGORY_BY_ID[Number(idCandidate)];
         if (byId && CATEGORY_ORDER.includes(byId)) return byId;
 
-        // 3) ไม่ตรงหน้าเมนู -> ไม่จัดแสดง
         return null;
     };
 
-    // จัดกลุ่มเฉพาะหมวดตามหน้าเมนู และเรียงตาม CATEGORY_ORDER (ไม่มี "อื่น ๆ")
+    // จัดกลุ่มตามหน้าเมนู
     const groupedMenus = useMemo(() => {
         const bucket = {};
         for (const m of menuList) {
             const cat = resolveCategoryName(m);
-            if (!cat) continue; // ตัดเมนูที่ไม่อยู่ใน 5 หมวดทิ้ง
+            if (!cat) continue;
             if (!bucket[cat]) bucket[cat] = [];
             bucket[cat].push(m);
         }
-
         const ordered = {};
         CATEGORY_ORDER.forEach((cat) => {
             if (bucket[cat]?.length) {
@@ -108,26 +104,30 @@ const EditOrderModal = ({ order, token, onClose }) => {
     );
 
     const handleSave = async () => {
-        const valid = selectedItems.every((item) => item.qty && !isNaN(item.qty));
+        const valid = selectedItems.every((item) => Number.isFinite(+item.qty) && +item.qty >= 1);
         if (!valid) {
             alert("กรุณากรอกจำนวนให้ครบทุกเมนู");
             return;
         }
         try {
+            // ส่งเฉพาะเมนู+จำนวน ให้ backend คิดราคาเอง
             const payload = {
                 orderItems: selectedItems.map((i) => ({
                     menuId: i.menuId,
-                    qty: i.qty,
-                    price: i.price,
+                    qty: Number(i.qty),
                 })),
-                totalPrice: total,
             };
+
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             onClose();
         } catch (err) {
-            console.error("อัปเดตเมนูล้มเหลว", err);
+            console.error("อัปเดตเมนูล้มเหลว", {
+                status: err?.response?.status,
+                data: err?.response?.data,
+            });
+            alert(`อัปเดตไม่สำเร็จ: ${err?.response?.data?.message || err.message}`);
         }
     };
 
@@ -136,10 +136,9 @@ const EditOrderModal = ({ order, token, onClose }) => {
             <div className="bg-white rounded shadow-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto">
                 <h2 className="text-lg font-bold mb-4">แก้ไขเมนู</h2>
 
-                {/* เมนูทั้งหมด (แยกตามหน้าเมนู และไม่มีหมวดอื่น ๆ) */}
+                {/* เมนูทั้งหมด (แยกตามหน้าเมนู) */}
                 <div className="mb-4">
                     <h3 className="font-semibold">เมนูทั้งหมด:</h3>
-
                     {Object.keys(groupedMenus).map((cat) => (
                         <div key={cat} className="mt-3">
                             <div className="text-sm font-semibold text-gray-600 px-1 py-0.5">
