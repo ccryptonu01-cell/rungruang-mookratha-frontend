@@ -1,9 +1,12 @@
+// ✅ โค้ด EditOrderModal.jsx (เวอร์ชันสมบูรณ์)
+
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 
 const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
         const fetchMenus = async () => {
@@ -14,22 +17,19 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 console.error("โหลดเมนูล้มเหลว", err);
             }
         };
-
         fetchMenus();
     }, []);
 
     useEffect(() => {
-        if (!order?.orderItems?.length || !menuList.length) return;
+        if (!order?.orderItems?.length || !menuList.length || initialized) return;
 
         const initial = order.orderItems
             .filter(item => item.menuId != null)
             .map(item => {
                 const menuId = Number(item.menuId);
-
                 const fallbackMenu = menuList.find(m => m.id === menuId);
                 const name = item.menu?.name || fallbackMenu?.name || `เมนู #${menuId}`;
                 const price = fallbackMenu?.price ?? item.price ?? 0;
-
                 return {
                     menuId,
                     qty: Number(item.qty || 1),
@@ -39,7 +39,8 @@ const EditOrderModal = ({ order, token, onClose }) => {
             });
 
         setSelectedItems(initial);
-    }, [order, menuList]);
+        setInitialized(true);
+    }, [order, menuList, initialized]);
 
     const handleQtyChange = (menuId, qty) => {
         const num = parseInt(qty);
@@ -69,8 +70,6 @@ const EditOrderModal = ({ order, token, onClose }) => {
         , 0);
 
     const handleSave = async () => {
-        console.log("🚀 เริ่ม handleSave", selectedItems);
-
         const valid = selectedItems.every(item =>
             Number.isInteger(item.menuId) &&
             item.menuId > 0 &&
@@ -79,9 +78,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
             !isNaN(item.price)
         );
 
-
         if (!valid) {
-            console.warn("❌ มีรายการที่ไม่สมบูรณ์:", selectedItems);
             alert("มีรายการที่ไม่สมบูรณ์ กรุณาตรวจสอบเมนูอีกครั้ง");
             return;
         }
@@ -96,13 +93,10 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 totalPrice: Number(total)
             };
 
-            console.log("📦 payload ที่จะส่ง:", payload);
-
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            console.log("✅ อัปเดตเมนูสำเร็จ");
             onClose();
         } catch (err) {
             console.error("❌ อัปเดตเมนูล้มเหลว:", err);
@@ -131,20 +125,24 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
                 <div>
                     <h3 className="font-semibold mb-2">เมนูที่เลือก:</h3>
-                    {selectedItems.map(item => (
-                        <div key={item.menuId} className="flex items-center justify-between border-b py-1">
-                            <span>{item.name}</span>
-                            <input
-                                type="number"
-                                min={1}
-                                className="border p-1 w-16 text-right"
-                                value={item.qty}
-                                onChange={e => handleQtyChange(item.menuId, e.target.value)}
-                            />
-                            <span>{isNaN(item.qty * item.price) ? "-" : item.qty * item.price}฿</span>
-                            <button onClick={() => handleRemoveItem(item.menuId)} className="text-red-500 ml-2">ลบ</button>
-                        </div>
-                    ))}
+                    {selectedItems.length === 0 ? (
+                        <p className="text-gray-500">ยังไม่มีเมนูที่เลือก</p>
+                    ) : (
+                        selectedItems.map(item => (
+                            <div key={item.menuId} className="flex items-center justify-between border-b py-1">
+                                <span>{item.name}</span>
+                                <input
+                                    type="number"
+                                    min={1}
+                                    className="border p-1 w-16 text-right"
+                                    value={item.qty}
+                                    onChange={e => handleQtyChange(item.menuId, e.target.value)}
+                                />
+                                <span>{isNaN(item.qty * item.price) ? "-" : item.qty * item.price}฿</span>
+                                <button onClick={() => handleRemoveItem(item.menuId)} className="text-red-500 ml-2">ลบ</button>
+                            </div>
+                        ))
+                    )}
                 </div>
 
                 <div className="mt-4 text-right">
