@@ -4,14 +4,15 @@ import axiosInstance from "../../utils/axiosInstance";
 const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [isMenuLoaded, setIsMenuLoaded] = useState(false);
 
-    // โหลดเมนูจาก backend
-    // โหลดเมนูจาก backend
+    // โหลดเมนู
     useEffect(() => {
         const fetchMenus = async () => {
             try {
                 const res = await axiosInstance.get("/admin/menu");
-                setMenuList(res.data.menus);
+                setMenuList(res.data.menus || []);
+                setIsMenuLoaded(true);
             } catch (err) {
                 console.error("โหลดเมนูล้มเหลว", err);
             }
@@ -19,9 +20,9 @@ const EditOrderModal = ({ order, token, onClose }) => {
         fetchMenus();
     }, []);
 
-    // ตั้งค่า selectedItems จาก order
+    // ตั้งค่า selectedItems เมื่อ menuList และ order.orderItems พร้อม
     useEffect(() => {
-        if (!order?.orderItems?.length || !menuList.length) return;
+        if (!isMenuLoaded || !order?.orderItems?.length) return;
 
         const initial = order.orderItems
             .map(item => {
@@ -30,20 +31,21 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
                 const fallbackMenu = menuList.find(m => m.id === menuId);
                 const name = item.menu?.name || fallbackMenu?.name || `เมนู #${menuId}`;
-                const price = fallbackMenu?.price ?? item.price ?? 0;
+                const price = Number(
+                    fallbackMenu?.price ?? item.price ?? item.menu?.price ?? 0
+                );
 
                 return {
                     menuId,
                     qty: Number(item.qty || 1),
-                    price: Number(price),
+                    price,
                     name,
                 };
             })
             .filter(item => item !== null);
 
-        console.log("🟩 ตั้งค่า selectedItems:", initial);
         setSelectedItems(initial);
-    }, [order, menuList]);
+    }, [isMenuLoaded, order?.orderItems, menuList]);
 
     // แก้จำนวน
     const handleQtyChange = (menuId, qty) => {
@@ -55,7 +57,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
         );
     };
 
-    // เพิ่มเมนูใหม่จากด้านบน
+    // เพิ่มเมนูใหม่
     const handleAddItem = (menu) => {
         if (selectedItems.some(item => item.menuId === menu.id)) return;
         setSelectedItems([...selectedItems, {
@@ -73,10 +75,9 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
     // คำนวณยอดรวม
     const total = selectedItems.reduce((sum, item) =>
-        sum + ((item.qty && item.price) ? item.qty * item.price : 0)
-        , 0);
+        sum + ((item.qty && item.price) ? item.qty * item.price : 0), 0);
 
-    // กด "บันทึก"
+    // บันทึก
     const handleSave = async () => {
         const valid = selectedItems.every(item =>
             Number.isInteger(item.menuId) &&
@@ -105,7 +106,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            onClose(); // ปิด Modal หลังบันทึก
+            onClose();
         } catch (err) {
             console.error("❌ อัปเดตเมนูล้มเหลว:", err);
             alert("บันทึกล้มเหลว กรุณาลองใหม่");
@@ -114,7 +115,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded shadow-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded shadow-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto font-prompt">
                 <h2 className="text-lg font-bold mb-4">แก้ไขเมนู</h2>
 
                 <div className="mb-4">
@@ -139,7 +140,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
                     ) : (
                         selectedItems.map(item => (
                             <div key={item.menuId} className="flex items-center justify-between border-b py-1">
-                                <span>{item.name}</span>
+                                <span className="w-1/3 truncate">{item.name}</span>
                                 <input
                                     type="number"
                                     min={1}
@@ -147,8 +148,13 @@ const EditOrderModal = ({ order, token, onClose }) => {
                                     value={item.qty}
                                     onChange={e => handleQtyChange(item.menuId, e.target.value)}
                                 />
-                                <span>{isNaN(item.qty * item.price) ? "-" : item.qty * item.price}฿</span>
-                                <button onClick={() => handleRemoveItem(item.menuId)} className="text-red-500 ml-2">ลบ</button>
+                                <span className="w-1/4 text-right">
+                                    {isNaN(item.qty * item.price) ? "-" : item.qty * item.price}฿
+                                </span>
+                                <button
+                                    onClick={() => handleRemoveItem(item.menuId)}
+                                    className="text-red-500 ml-2"
+                                >ลบ</button>
                             </div>
                         ))
                     )}
