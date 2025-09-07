@@ -23,12 +23,13 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 setMenuList(menus);
 
                 const initial = order.orderItems.map(item => ({
-                    menuId: Number(item.menuId),
+                    menuId: Number(item.menuId ?? item.menu?.id ?? 0),
                     qty: Number(item.qty) || 1,
-                    price: toNumber(item.price),
+                    price: toNumber(item.price ?? item.menu?.price ?? 0),
                     name: item.menu?.name || ""
                 }));
                 setSelectedItems(initial);
+                console.table(initial);
 
             } catch (err) {
                 console.error("โหลดเมนูล้มเหลว", err);
