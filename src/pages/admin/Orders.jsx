@@ -347,7 +347,6 @@ const Orders = () => {
           order={editOrder}
           token={token}
           onClose={() => {
-            console.log("🔵 เปิด Modal โดยส่ง order =", selectedOrder);
             setEditOrder(null);
             fetchOrders();
           }}
