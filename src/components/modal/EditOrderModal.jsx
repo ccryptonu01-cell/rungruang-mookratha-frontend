@@ -6,6 +6,8 @@ const EditOrderModal = ({ order, token, onClose }) => {
     const [selectedItems, setSelectedItems] = useState([]);
     const [isMenuLoaded, setIsMenuLoaded] = useState(false);
 
+    console.log("👀 EditOrderModal เปิดขึ้นโดยได้รับ order =", order);
+
     if (!order || !order.orderItems) return null;
 
     // โหลดเมนู
