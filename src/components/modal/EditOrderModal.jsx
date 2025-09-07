@@ -24,7 +24,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
     // 2. รอ menuList และ order พร้อมแล้ว ค่อย map
     useEffect(() => {
-        if (!menuList.length || !order?.orderItems?.length) return;
+        if (!isMenuLoaded || !menuList.length || !order?.orderItems?.length) return;
 
         const initial = order.orderItems
             .map(item => {
@@ -32,7 +32,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 if (!menuId) return null;
 
                 const existingMenu = menuList.find(m => m.id === menuId);
-                if (!existingMenu) return null; //
+                if (!existingMenu) return null;
 
                 return {
                     menuId,
@@ -44,7 +44,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
             .filter(Boolean);
 
         setSelectedItems(initial);
-    }, [menuList, order]);
+    }, [isMenuLoaded, menuList, order]);
 
     // แก้จำนวน
     const handleQtyChange = (menuId, qty) => {
