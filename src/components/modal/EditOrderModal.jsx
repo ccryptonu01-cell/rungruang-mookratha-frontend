@@ -18,9 +18,8 @@ const EditOrderModal = ({ order, token, onClose }) => {
         fetchMenus();
     }, []);
 
-    // เมื่อโหลดเมนูเสร็จ และ order มีข้อมูล → map ข้อมูลเดิมมาแสดง
-    useEffect(() => {
-        if (!order?.orderItems?.length || !menuList.length) return;
+    seEffect(() => {
+        if (!order || !order.orderItems || !menuList.length) return;
 
         const initial = order.orderItems
             .filter(item => item.menuId != null)
@@ -39,7 +38,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
             });
 
         setSelectedItems(initial);
-    }, [order, menuList]);
+    }, [order?.id, menuList]);
 
     // แก้จำนวน
     const handleQtyChange = (menuId, qty) => {
