@@ -31,7 +31,7 @@ const groupMenusByCategory = (menus) => {
 
 const getSortedCategoryEntries = (menus) => {
     const grouped = groupMenusByCategory(menus);
-    return CATEGORY_ORDER.map(id => {
+    return CATEGORY_ORDER.map((id) => {
         const name = CATEGORY_MAP[id];
         return [name, grouped[name] || []];
     }).filter(([_, menus]) => menus.length > 0);
@@ -40,10 +40,7 @@ const getSortedCategoryEntries = (menus) => {
 const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
-
     const [searchTerm, setSearchTerm] = useState("");
-    const [minPrice, setMinPrice] = useState("");
-    const [maxPrice, setMaxPrice] = useState("");
     const [sortOrder, setSortOrder] = useState(""); // "asc" | "desc"
 
     useEffect(() => {
@@ -51,19 +48,19 @@ const EditOrderModal = ({ order, token, onClose }) => {
             try {
                 const res = await axiosInstance.get("/admin/menu");
                 const menus = (res.data.menus || [])
-                    .filter(m => Number.isInteger(m.id))
-                    .map(m => ({
+                    .filter((m) => Number.isInteger(m.id))
+                    .map((m) => ({
                         ...m,
                         price: toNumber(m.price),
                     }));
                 setMenuList(menus);
 
                 const initial = order.orderItems
-                    .filter(item => item.menu?.id)
+                    .filter((item) => item.menu?.id)
                     .map((item) => {
                         const menuId = Number(item.menu?.id);
                         const price = toNumber(item.menu?.price ?? item.price);
-                        const name = item.menu?.name || `เมนูไม่มีชื่อ`;
+                        const name = item.menu?.name || "เมนูไม่มีชื่อ";
                         return {
                             menuId,
                             qty: Number(item.qty) || 1,
@@ -83,9 +80,9 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
     const handleQtyChange = (menuId, qty, name) => {
         const num = parseInt(qty);
-        setSelectedItems(prev =>
-            prev.map(item =>
-                (item.menuId === menuId || item.name === name)
+        setSelectedItems((prev) =>
+            prev.map((item) =>
+                item.menuId === menuId || item.name === name
                     ? { ...item, qty: isNaN(num) || num < 1 ? 1 : num }
                     : item
             )
@@ -93,8 +90,8 @@ const EditOrderModal = ({ order, token, onClose }) => {
     };
 
     const handleRemoveItem = (menuId, name) => {
-        setSelectedItems(prev =>
-            prev.filter(item => !(item.menuId === menuId || item.name === name))
+        setSelectedItems((prev) =>
+            prev.filter((item) => !(item.menuId === menuId || item.name === name))
         );
     };
 
@@ -104,15 +101,15 @@ const EditOrderModal = ({ order, token, onClose }) => {
             alert(`ไม่สามารถเพิ่มเมนู "${menu.name}" ได้ (ไม่มีรหัสเมนู)`);
             return;
         }
-        if (selectedItems.some(item => item.menuId === menuId)) return;
-        setSelectedItems(prev => [
+        if (selectedItems.some((item) => item.menuId === menuId)) return;
+        setSelectedItems((prev) => [
             ...prev,
             {
                 menuId,
                 qty: 1,
                 price: toNumber(menu.price),
                 name: menu.name,
-            }
+            },
         ]);
     };
 
@@ -123,9 +120,12 @@ const EditOrderModal = ({ order, token, onClose }) => {
     }, 0);
 
     const handleSave = async () => {
-        const validItems = selectedItems.filter(it =>
-            Number.isInteger(it.qty) && it.qty > 0 &&
-            Number.isFinite(toNumber(it.price)) && toNumber(it.price) >= 0
+        const validItems = selectedItems.filter(
+            (it) =>
+                Number.isInteger(it.qty) &&
+                it.qty > 0 &&
+                Number.isFinite(toNumber(it.price)) &&
+                toNumber(it.price) >= 0
         );
 
         const payload = {
@@ -135,18 +135,23 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 price: toNumber(price),
                 name,
             })),
-            totalPrice: validItems.reduce((sum, item) =>
-                sum + item.qty * toNumber(item.price), 0
+            totalPrice: validItems.reduce(
+                (sum, item) => sum + item.qty * toNumber(item.price),
+                0
             ),
         };
 
         try {
-            await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            await axiosInstance.put(
+                `/admin/orders/detail/${order.id}`,
+                payload,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             onClose();
         } catch (err) {
             console.error("อัปเดตเมนูล้มเหลว:", err?.response?.data || err);
@@ -154,19 +159,9 @@ const EditOrderModal = ({ order, token, onClose }) => {
         }
     };
 
-    const filteredMenus = menuList.filter(menu => {
-        const lowerName = menu.name.toLowerCase();
-        const term = searchTerm.toLowerCase();
-        const price = menu.price;
-        const min = toNumber(minPrice);
-        const max = toNumber(maxPrice);
-
-        const nameMatch = lowerName.includes(term);
-        const minMatch = isNaN(min) || price >= min;
-        const maxMatch = isNaN(max) || price <= max;
-
-        return nameMatch && minMatch && maxMatch;
-    });
+    const filteredMenus = menuList.filter((menu) =>
+        menu.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const sortedMenus = [...filteredMenus].sort((a, b) => {
         if (sortOrder === "asc") return a.price - b.price;
@@ -176,7 +171,16 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded shadow-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded shadow-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto relative">
+                {/* ❌ ปุ่มปิด */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl font-bold"
+                    aria-label="Close"
+                >
+                    ×
+                </button>
+
                 <h2 className="text-lg font-bold mb-4">แก้ไขเมนู</h2>
 
                 <div className="mb-4">
@@ -190,23 +194,9 @@ const EditOrderModal = ({ order, token, onClose }) => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
 
-                    <div className="flex gap-2 mb-4">
-                        <input
-                            type="number"
-                            placeholder="ราคาขั้นต่ำ"
-                            className="border rounded p-1 w-1/3"
-                            value={minPrice}
-                            onChange={(e) => setMinPrice(e.target.value)}
-                        />
-                        <input
-                            type="number"
-                            placeholder="ราคาสูงสุด"
-                            className="border rounded p-1 w-1/3"
-                            value={maxPrice}
-                            onChange={(e) => setMaxPrice(e.target.value)}
-                        />
+                    <div className="flex justify-end mb-4">
                         <select
-                            className="border rounded p-1 w-1/3"
+                            className="border rounded p-1 w-full"
                             value={sortOrder}
                             onChange={(e) => setSortOrder(e.target.value)}
                         >
@@ -220,7 +210,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
                         <div key={category} className="mb-2">
                             <h4 className="font-bold mt-2 text-red-600">{category}</h4>
                             <div className="grid grid-cols-2 gap-2">
-                                {menus.map(menu => (
+                                {menus.map((menu) => (
                                     <button
                                         key={menu.id}
                                         onClick={() => handleAddItem(menu)}
@@ -237,17 +227,27 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 <div>
                     <h3 className="font-semibold mb-2">เมนูที่เลือก:</h3>
                     {selectedItems.map((item, index) => (
-                        <div key={item.menuId ?? `${item.name}-${index}`} className="flex items-center justify-between border-b py-1">
+                        <div
+                            key={item.menuId ?? `${item.name}-${index}`}
+                            className="flex items-center justify-between border-b py-1"
+                        >
                             <span>{item.name}</span>
                             <input
                                 type="number"
                                 min={1}
                                 className="border p-1 w-16 text-right"
                                 value={item.qty}
-                                onChange={e => handleQtyChange(item.menuId, e.target.value, item.name)}
+                                onChange={(e) =>
+                                    handleQtyChange(item.menuId, e.target.value, item.name)
+                                }
                             />
-                            <span>{isNaN(item.qty * item.price) ? "-" : item.qty * item.price}฿</span>
-                            <button onClick={() => handleRemoveItem(item.menuId, item.name)} className="text-red-500 ml-2">
+                            <span>
+                                {isNaN(item.qty * item.price) ? "-" : item.qty * item.price}฿
+                            </span>
+                            <button
+                                onClick={() => handleRemoveItem(item.menuId, item.name)}
+                                className="text-red-500 ml-2"
+                            >
                                 ลบ
                             </button>
                         </div>
@@ -259,8 +259,18 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 </div>
 
                 <div className="mt-4 flex justify-end gap-2">
-                    <button onClick={onClose} className="bg-gray-300 px-4 py-2 rounded">ยกเลิก</button>
-                    <button onClick={handleSave} className="bg-green-500 text-white px-4 py-2 rounded">บันทึก</button>
+                    <button
+                        onClick={onClose}
+                        className="bg-gray-300 px-4 py-2 rounded"
+                    >
+                        ยกเลิก
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        className="bg-green-500 text-white px-4 py-2 rounded"
+                    >
+                        บันทึก
+                    </button>
                 </div>
             </div>
         </div>
