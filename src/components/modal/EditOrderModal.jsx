@@ -53,27 +53,39 @@ const EditOrderModal = ({ order, token, onClose }) => {
         , 0);
 
     const handleSave = async () => {
-        const valid = selectedItems.every(item => item.qty && !isNaN(item.qty));
-        if (!valid) {
-            alert("กรุณากรอกจำนวนให้ครบทุกเมนู");
+        const normalized = selectedItems.map(it => ({
+            menuId: Number(it.menuId),
+            qty: Number(it.qty ?? 0),
+            price: Number(it.price ?? NaN),
+        }));
+
+        // validate ฝั่งหน้าเว็บก่อนส่ง
+        const invalid = normalized.find((it) =>
+            !Number.isInteger(it.menuId) || it.menuId <= 0 ||
+            !Number.isInteger(it.qty) || it.qty <= 0 ||
+            Number.isNaN(it.price) || it.price < 0
+        );
+        if (invalid) {
+            alert("มีข้อมูลเมนูไม่ถูกต้อง (จำนวนต้อง ≥1 และราคาเป็นตัวเลข)");
             return;
         }
 
+        const payload = {
+            orderItems: normalized,
+            totalPrice: Number(total), 
+        };
+
         try {
-            const payload = {
-                orderItems: selectedItems.map(item => ({
-                    menuId: item.menuId,
-                    qty: item.qty,
-                    price: item.price 
-                })),
-                totalPrice: total
-            };
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`, 
+                },
             });
             onClose();
         } catch (err) {
-            console.error("อัปเดตเมนูล้มเหลว", err);
+            console.error("อัปเดตเมนูล้มเหลว:", err?.response?.data || err);
+            alert(err?.response?.data?.message || "แก้ไขคำสั่งซื้อไม่สำเร็จ");
         }
     };
 
