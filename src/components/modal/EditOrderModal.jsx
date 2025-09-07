@@ -19,16 +19,22 @@ const EditOrderModal = ({ order, token, onClose }) => {
     }, []);
 
     useEffect(() => {
+        if (!order?.orderItems?.length || !menuList.length) return;
+
         const initial = order.orderItems
             .filter(item => item.menuId != null)
             .map(item => {
                 const menuId = Number(item.menuId);
-                const fallback = menuList.find(m => m.id === menuId)?.name || "";
+
+                const fallbackMenu = menuList.find(m => m.id === menuId);
+                const name = item.menu?.name || fallbackMenu?.name || `เมนู #${menuId}`;
+                const price = fallbackMenu?.price ?? item.price ?? 0;
+
                 return {
                     menuId,
                     qty: Number(item.qty || 1),
-                    price: Number(item.price || 0),
-                    name: item.menu?.name || fallback,
+                    price: Number(price),
+                    name,
                 };
             });
 
