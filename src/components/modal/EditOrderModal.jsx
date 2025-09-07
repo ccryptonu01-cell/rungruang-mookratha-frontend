@@ -6,6 +6,8 @@ const EditOrderModal = ({ order, token, onClose }) => {
     const [selectedItems, setSelectedItems] = useState([]);
     const [isMenuLoaded, setIsMenuLoaded] = useState(false);
 
+    if (!order || !order.orderItems) return null;
+
     // โหลดเมนู
     useEffect(() => {
         const fetchMenus = async () => {
