@@ -30,7 +30,6 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
                         return { menuId, qty: Number(item.qty) || 1, price, name };
                     })
-                    .filter(it => Number.isInteger(it.menuId) && it.menuId > 0); // ✅ ลบตัวที่ไม่มี menuId ออก
                 setSelectedItems(initial);
                 console.table(initial);
 
@@ -52,9 +51,18 @@ const EditOrderModal = ({ order, token, onClose }) => {
     };
 
     const handleAddItem = (menu) => {
-        if (selectedItems.some(item => item.menuId === menu.id)) return;
+        const menuId = Number(menu.id);
+
+        if (!Number.isInteger(menuId) || menuId <= 0) {
+            console.warn("❌ เมนูไม่มี id:", menu);
+            alert(`ไม่สามารถเพิ่มเมนู "${menu.name}" ได้ (ไม่มีรหัสเมนู)`);
+            return;
+        }
+
+        if (selectedItems.some(item => item.menuId === menuId)) return;
+
         setSelectedItems([...selectedItems, {
-            menuId: menu.id,
+            menuId,
             qty: 1,
             price: toNumber(menu.price),
             name: menu.name
