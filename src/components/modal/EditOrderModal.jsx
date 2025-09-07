@@ -22,17 +22,19 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 }));
                 setMenuList(menus);
 
-                const initial = order.orderItems.map((item, index) => {
-                    const menuId = Number(item.menuId ?? item.menu?.id);
-                    const price = toNumber(item.price ?? item.menu?.price);
-                    const name = item.menu?.name || item.name || `เมนูไม่มีชื่อ ${index}`;
-                    return {
-                        menuId: Number.isFinite(menuId) ? menuId : null,
-                        qty: Number(item.qty) || 1,
-                        price,
-                        name,
-                    };
-                });
+                const initial = order.orderItems
+                    .filter(item => item.menu?.id) // ✅ ลบเมนูที่ไม่มี menuId
+                    .map((item) => {
+                        const menuId = Number(item.menu?.id);
+                        const price = toNumber(item.menu?.price ?? item.price);
+                        const name = item.menu?.name || `เมนูไม่มีชื่อ`;
+                        return {
+                            menuId,
+                            qty: Number(item.qty) || 1,
+                            price,
+                            name,
+                        };
+                    });
 
                 setSelectedItems(initial);
             } catch (err) {
@@ -92,7 +94,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
         const payload = {
             orderItems: validItems.map(({ menuId, qty, price, name }) => ({
-                menuId: Number.isInteger(menuId) ? menuId : undefined, // ✅ ส่ง undefined ถ้าไม่มี
+                menuId: Number.isInteger(menuId) ? menuId : undefined, // ถ้ามี menuId ให้ส่ง ถ้าไม่มีไม่ต้องส่ง
                 qty: Number(qty),
                 price: toNumber(price),
                 name,
