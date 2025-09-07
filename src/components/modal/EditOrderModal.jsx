@@ -5,7 +5,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
 
-    // โหลดเมนูทั้งหมด
+    // โหลดเมนูจาก backend
     useEffect(() => {
         const fetchMenus = async () => {
             try {
@@ -18,7 +18,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
         fetchMenus();
     }, []);
 
-    // โหลดข้อมูล order เดิม
+    // เมื่อโหลดเมนูเสร็จ และ order มีข้อมูล → map ข้อมูลเดิมมาแสดง
     useEffect(() => {
         if (!order?.orderItems?.length || !menuList.length) return;
 
@@ -41,6 +41,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
         setSelectedItems(initial);
     }, [order, menuList]);
 
+    // แก้จำนวน
     const handleQtyChange = (menuId, qty) => {
         const num = parseInt(qty);
         setSelectedItems(prev =>
@@ -50,6 +51,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
         );
     };
 
+    // เพิ่มเมนูใหม่จากด้านบน
     const handleAddItem = (menu) => {
         if (selectedItems.some(item => item.menuId === menu.id)) return;
         setSelectedItems([...selectedItems, {
@@ -60,14 +62,17 @@ const EditOrderModal = ({ order, token, onClose }) => {
         }]);
     };
 
+    // ลบเมนู
     const handleRemoveItem = (menuId) => {
         setSelectedItems(prev => prev.filter(item => item.menuId !== menuId));
     };
 
+    // คำนวณยอดรวม
     const total = selectedItems.reduce((sum, item) =>
         sum + ((item.qty && item.price) ? item.qty * item.price : 0)
         , 0);
 
+    // กด "บันทึก"
     const handleSave = async () => {
         const valid = selectedItems.every(item =>
             Number.isInteger(item.menuId) &&
@@ -96,9 +101,10 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            onClose();
+            onClose(); // ปิด Modal หลังบันทึก
         } catch (err) {
             console.error("❌ อัปเดตเมนูล้มเหลว:", err);
+            alert("บันทึกล้มเหลว กรุณาลองใหม่");
         }
     };
 
