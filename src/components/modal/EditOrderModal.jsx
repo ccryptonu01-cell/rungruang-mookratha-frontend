@@ -80,7 +80,10 @@ const EditOrderModal = ({ order, token, onClose }) => {
         setSelectedItems((prev) =>
             prev.map((item) =>
                 item.menuId === menuId
-                    ? { ...item, qty: !Number.isFinite(num) || num < 1 ? 1 : num }
+                    ? {
+                        ...item,
+                        qty: Number.isNaN(num) || num < 1 ? 1 : Math.floor(num),
+                    }
                     : item
             )
         );
