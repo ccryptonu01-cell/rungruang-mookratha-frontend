@@ -257,7 +257,7 @@ const Orders = () => {
                   <div className="space-y-1">
                     {order.orderItems?.map((item, idx) => (
                       <div key={idx}>
-                        • {item.menu?.name} × {item.quantity}{" "}
+                        • {item.menu?.name || item.name} × {item.quantity}{" "}
                         <span className="text-gray-500">({item.price}฿)</span>
                       </div>
                     ))}
