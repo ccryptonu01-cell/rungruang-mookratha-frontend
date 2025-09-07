@@ -20,32 +20,30 @@ const EditOrderModal = ({ order, token, onClose }) => {
         fetchMenus();
     }, []);
 
-    // ตั้งค่า selectedItems เมื่อ menuList และ order.orderItems พร้อม
+    // 2. รอ menuList และ order พร้อมแล้ว ค่อย map
     useEffect(() => {
-        if (!isMenuLoaded || !order?.orderItems?.length) return;
+        if (!menuList.length || !order?.orderItems?.length) return;
 
-        const initial = order.orderItems
-            .map(item => {
-                const menuId = Number(item.menuId || item.menu?.id);
-                if (!menuId) return null;
+        const initial = order.orderItems.map(item => {
+            const menuId = Number(item.menuId || item.menu?.id);
+            if (!menuId) return null;
 
-                const fallbackMenu = menuList.find(m => m.id === menuId);
-                const name = item.menu?.name || fallbackMenu?.name || `เมนู #${menuId}`;
-                const price = Number(
-                    fallbackMenu?.price ?? item.price ?? item.menu?.price ?? 0
-                );
+            const fallbackMenu = menuList.find(m => m.id === menuId);
+            const name = item.menu?.name || fallbackMenu?.name || `เมนู #${menuId}`;
+            const price = Number(
+                fallbackMenu?.price ?? item.price ?? item.menu?.price ?? 0
+            );
 
-                return {
-                    menuId,
-                    qty: Number(item.qty || 1),
-                    price,
-                    name,
-                };
-            })
-            .filter(item => item !== null);
+            return {
+                menuId,
+                qty: Number(item.qty || 1),
+                price,
+                name,
+            };
+        }).filter(Boolean);
 
         setSelectedItems(initial);
-    }, [isMenuLoaded, order?.orderItems, menuList]);
+    }, [menuList, order]);
 
     // แก้จำนวน
     const handleQtyChange = (menuId, qty) => {
