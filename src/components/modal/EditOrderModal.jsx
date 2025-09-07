@@ -8,7 +8,6 @@ const toNumber = (v) => {
     return cleaned === "" ? NaN : Number(cleaned);
 };
 
-// หมวดหมู่
 const CATEGORY_MAP = {
     30001: "ชุดหมูกระทะ",
     60001: "ชุดผัก",
@@ -42,17 +41,17 @@ const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
 
-    // ช่องค้นหาและกรองราคา
     const [searchTerm, setSearchTerm] = useState("");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
+    const [sortOrder, setSortOrder] = useState(""); // "asc" | "desc"
 
     useEffect(() => {
         const fetchMenus = async () => {
             try {
                 const res = await axiosInstance.get("/admin/menu");
                 const menus = (res.data.menus || [])
-                    .filter(m => Number.isInteger(m.id)) // ✅ ลบเมนูที่ไม่มี id
+                    .filter(m => Number.isInteger(m.id))
                     .map(m => ({
                         ...m,
                         price: toNumber(m.price),
@@ -155,7 +154,6 @@ const EditOrderModal = ({ order, token, onClose }) => {
         }
     };
 
-    // กรองเมนูตามชื่อและราคาที่กำหนด
     const filteredMenus = menuList.filter(menu => {
         const lowerName = menu.name.toLowerCase();
         const term = searchTerm.toLowerCase();
@@ -168,6 +166,12 @@ const EditOrderModal = ({ order, token, onClose }) => {
         const maxMatch = isNaN(max) || price <= max;
 
         return nameMatch && minMatch && maxMatch;
+    });
+
+    const sortedMenus = [...filteredMenus].sort((a, b) => {
+        if (sortOrder === "asc") return a.price - b.price;
+        if (sortOrder === "desc") return b.price - a.price;
+        return 0;
     });
 
     return (
@@ -190,20 +194,29 @@ const EditOrderModal = ({ order, token, onClose }) => {
                         <input
                             type="number"
                             placeholder="ราคาขั้นต่ำ"
-                            className="border rounded p-1 w-1/2"
+                            className="border rounded p-1 w-1/3"
                             value={minPrice}
                             onChange={(e) => setMinPrice(e.target.value)}
                         />
                         <input
                             type="number"
                             placeholder="ราคาสูงสุด"
-                            className="border rounded p-1 w-1/2"
+                            className="border rounded p-1 w-1/3"
                             value={maxPrice}
                             onChange={(e) => setMaxPrice(e.target.value)}
                         />
+                        <select
+                            className="border rounded p-1 w-1/3"
+                            value={sortOrder}
+                            onChange={(e) => setSortOrder(e.target.value)}
+                        >
+                            <option value="">เรียงตาม...</option>
+                            <option value="asc">ราคาน้อย → มาก</option>
+                            <option value="desc">ราคามาก → น้อย</option>
+                        </select>
                     </div>
 
-                    {getSortedCategoryEntries(filteredMenus).map(([category, menus]) => (
+                    {getSortedCategoryEntries(sortedMenus).map(([category, menus]) => (
                         <div key={category} className="mb-2">
                             <h4 className="font-bold mt-2 text-red-600">{category}</h4>
                             <div className="grid grid-cols-2 gap-2">
