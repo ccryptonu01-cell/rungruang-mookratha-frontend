@@ -16,9 +16,9 @@ const EditOrderModal = ({ order, token, onClose }) => {
         };
 
         const initial = order.orderItems.map(item => ({
-            menuId: item.menuId,
-            qty: item.qty || 1,
-            price: item.price,
+            menuId: Number(item.menuId),
+            qty: Number(item.qty || 1),
+            price: Number(item.price || 0),
             name: item.menu?.name || ""
         }));
         setSelectedItems(initial);
@@ -53,9 +53,17 @@ const EditOrderModal = ({ order, token, onClose }) => {
         , 0);
 
     const handleSave = async () => {
-        const valid = selectedItems.every(item => item.qty && !isNaN(item.qty));
+        const valid = selectedItems.every(
+            item =>
+                item.menuId !== null &&
+                !isNaN(item.menuId) &&
+                item.qty &&
+                !isNaN(item.qty) &&
+                !isNaN(item.price)
+        );
+
         if (!valid) {
-            alert("กรุณากรอกจำนวนให้ครบทุกเมนู");
+            alert("มีรายการที่ไม่สมบูรณ์ กรุณาตรวจสอบเมนูอีกครั้ง");
             return;
         }
 
