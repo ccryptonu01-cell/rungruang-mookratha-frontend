@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 
+const toNumber = (v) => {
+    if (typeof v === "number") return v;
+    if (v == null) return NaN;
+    const cleaned = String(v).replace(/[^\d.]/g, ""); // เอา ฿, ช่องว่าง ฯลฯ ออก
+    return cleaned === "" ? NaN : Number(cleaned);
+};
+
 const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -9,16 +16,20 @@ const EditOrderModal = ({ order, token, onClose }) => {
         const fetchMenus = async () => {
             try {
                 const res = await axiosInstance.get("/admin/menu");
-                setMenuList(res.data.menus);
+                const menus = (res.data.menus || []).map(m => ({
+                    ...m,
+                    price: toNumber(m.price),
+                }));
+                setMenuList(menus);
             } catch (err) {
                 console.error("โหลดเมนูล้มเหลว", err);
             }
         };
 
         const initial = order.orderItems.map(item => ({
-            menuId: item.menuId,
-            qty: item.qty || 1,
-            price: item.price,
+            menuId: Number(item.menuId),
+            qty: Number(item.qty) || 1,
+            price: toNumber(item.price),
             name: item.menu?.name || ""
         }));
         setSelectedItems(initial);
@@ -39,7 +50,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
         setSelectedItems([...selectedItems, {
             menuId: menu.id,
             qty: 1,
-            price: menu.price,
+            price: toNumber(menu.price),
             name: menu.name
         }]);
     };
@@ -48,38 +59,41 @@ const EditOrderModal = ({ order, token, onClose }) => {
         setSelectedItems(prev => prev.filter(item => item.menuId !== menuId));
     };
 
-    const total = selectedItems.reduce((sum, item) =>
-        sum + ((item.qty && item.price) ? item.qty * item.price : 0)
-        , 0);
+    const total = selectedItems.reduce((sum, item) => {
+        const q = Number(item.qty);
+        const p = toNumber(item.price);
+        return sum + (Number.isFinite(q) && Number.isFinite(p) ? q * p : 0);
+    }, 0);
 
     const handleSave = async () => {
         const normalized = selectedItems.map(it => ({
             menuId: Number(it.menuId),
-            qty: Number(it.qty ?? 0),
-            price: Number(it.price ?? NaN),
+            qty: Number(it.qty),
+            price: toNumber(it.price),
+            name: it.name,
         }));
 
-        // validate ฝั่งหน้าเว็บก่อนส่ง
         const invalid = normalized.find((it) =>
             !Number.isInteger(it.menuId) || it.menuId <= 0 ||
             !Number.isInteger(it.qty) || it.qty <= 0 ||
-            Number.isNaN(it.price) || it.price < 0
+            !Number.isFinite(it.price) || it.price < 0
         );
         if (invalid) {
-            alert("มีข้อมูลเมนูไม่ถูกต้อง (จำนวนต้อง ≥1 และราคาเป็นตัวเลข)");
+            console.warn("Invalid menu item:", invalid);
+            alert(`มีข้อมูลเมนูไม่ถูกต้อง: ${invalid.name || invalid.menuId} (จำนวนต้อง ≥1 และราคาเป็นตัวเลข)`);
             return;
         }
 
         const payload = {
-            orderItems: normalized,
-            totalPrice: Number(total), 
+            orderItems: normalized.map(({ menuId, qty, price }) => ({ menuId, qty, price })),
+            totalPrice: Number(total),
         };
 
         try {
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`, 
+                    Authorization: `Bearer ${token}`,
                 },
             });
             onClose();
