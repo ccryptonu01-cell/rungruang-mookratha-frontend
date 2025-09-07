@@ -109,18 +109,24 @@ const EditOrderModal = ({ order, token, onClose }) => {
             alert("กรุณากรอกจำนวนให้ครบทุกเมนู");
             return;
         }
+
         try {
-            // ส่งเฉพาะเมนู+จำนวน ให้ backend คิดราคาเอง
             const payload = {
                 orderItems: selectedItems.map((i) => ({
                     menuId: i.menuId,
                     qty: Number(i.qty),
+                    price: Number(i.price),
                 })),
+                totalPrice: selectedItems.reduce(
+                    (sum, i) => sum + Number(i.qty) * Number(i.price || 0),
+                    0
+                )
             };
 
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${token}` }
             });
+
             onClose();
         } catch (err) {
             console.error("อัปเดตเมนูล้มเหลว", {
