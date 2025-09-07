@@ -6,6 +6,9 @@ const EditOrderModal = ({ order, token, onClose }) => {
     const [selectedItems, setSelectedItems] = useState([]);
     const [isMenuLoaded, setIsMenuLoaded] = useState(false);
 
+    console.log("📦 order ที่รับมา:", order);
+    console.log("📦 order.orderItems:", order?.orderItems);
+
     if (!order || !order.orderItems) return null;
 
     // โหลดเมนู
