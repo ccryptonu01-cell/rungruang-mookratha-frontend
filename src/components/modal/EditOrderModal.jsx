@@ -76,11 +76,11 @@ const EditOrderModal = ({ order, token, onClose }) => {
     }, [menuList]);
 
     const handleQtyChange = (menuId, qty) => {
-        const num = parseInt(qty);
+        const num = Number(qty);
         setSelectedItems((prev) =>
             prev.map((item) =>
                 item.menuId === menuId
-                    ? { ...item, qty: isNaN(num) || num < 1 ? 1 : num }
+                    ? { ...item, qty: !Number.isFinite(num) || num < 1 ? 1 : num }
                     : item
             )
         );
@@ -90,7 +90,12 @@ const EditOrderModal = ({ order, token, onClose }) => {
         if (selectedItems.some((item) => item.menuId === menu.id)) return;
         setSelectedItems((prev) => [
             ...prev,
-            { menuId: menu.id, qty: 1, price: menu.price, name: menu.name },
+            {
+                menuId: Number(menu.id),
+                qty: 1,
+                price: Number(menu.price) || 0,
+                name: menu.name,
+            },
         ]);
     };
 
@@ -112,7 +117,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 +item.qty >= 1
         );
 
-        if (!valid) {
+        if (!valid || selectedItems.length === 0) {
             alert("กรุณากรอกจำนวนให้ถูกต้อง");
             return;
         }
@@ -130,7 +135,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 ),
             };
 
-            console.log("📦 payload ที่จะส่ง:", payload);
+            console.log("📦 payload ที่จะส่ง:", payload); // DEBUG
 
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
                 headers: { Authorization: `Bearer ${token}` },
