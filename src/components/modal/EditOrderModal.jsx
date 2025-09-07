@@ -18,7 +18,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
         fetchMenus();
     }, []);
 
-    seEffect(() => {
+    useEffect(() => {
         if (!order || !order.orderItems || !menuList.length) return;
 
         const initial = order.orderItems
