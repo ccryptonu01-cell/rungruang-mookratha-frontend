@@ -42,18 +42,25 @@ const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
 
+    // ช่องค้นหาและกรองราคา
+    const [searchTerm, setSearchTerm] = useState("");
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
+
     useEffect(() => {
         const fetchMenus = async () => {
             try {
                 const res = await axiosInstance.get("/admin/menu");
-                const menus = (res.data.menus || []).map(m => ({
-                    ...m,
-                    price: toNumber(m.price),
-                }));
+                const menus = (res.data.menus || [])
+                    .filter(m => Number.isInteger(m.id)) // ✅ ลบเมนูที่ไม่มี id
+                    .map(m => ({
+                        ...m,
+                        price: toNumber(m.price),
+                    }));
                 setMenuList(menus);
 
                 const initial = order.orderItems
-                    .filter(item => item.menu?.id) // ✅ ลบเมนูที่ไม่มี id
+                    .filter(item => item.menu?.id)
                     .map((item) => {
                         const menuId = Number(item.menu?.id);
                         const price = toNumber(item.menu?.price ?? item.price);
@@ -148,6 +155,21 @@ const EditOrderModal = ({ order, token, onClose }) => {
         }
     };
 
+    // กรองเมนูตามชื่อและราคาที่กำหนด
+    const filteredMenus = menuList.filter(menu => {
+        const lowerName = menu.name.toLowerCase();
+        const term = searchTerm.toLowerCase();
+        const price = menu.price;
+        const min = toNumber(minPrice);
+        const max = toNumber(maxPrice);
+
+        const nameMatch = lowerName.includes(term);
+        const minMatch = isNaN(min) || price >= min;
+        const maxMatch = isNaN(max) || price <= max;
+
+        return nameMatch && minMatch && maxMatch;
+    });
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded shadow-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto">
@@ -155,7 +177,33 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
                 <div className="mb-4">
                     <h3 className="font-semibold">เมนูทั้งหมด:</h3>
-                    {getSortedCategoryEntries(menuList).map(([category, menus]) => (
+
+                    <input
+                        type="text"
+                        placeholder="ค้นหาเมนู..."
+                        className="border rounded p-1 w-full mb-2"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+
+                    <div className="flex gap-2 mb-4">
+                        <input
+                            type="number"
+                            placeholder="ราคาขั้นต่ำ"
+                            className="border rounded p-1 w-1/2"
+                            value={minPrice}
+                            onChange={(e) => setMinPrice(e.target.value)}
+                        />
+                        <input
+                            type="number"
+                            placeholder="ราคาสูงสุด"
+                            className="border rounded p-1 w-1/2"
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.target.value)}
+                        />
+                    </div>
+
+                    {getSortedCategoryEntries(filteredMenus).map(([category, menus]) => (
                         <div key={category} className="mb-2">
                             <h4 className="font-bold mt-2 text-red-600">{category}</h4>
                             <div className="grid grid-cols-2 gap-2">
