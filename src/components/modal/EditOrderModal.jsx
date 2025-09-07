@@ -4,56 +4,27 @@ import axiosInstance from "../../utils/axiosInstance";
 const EditOrderModal = ({ order, token, onClose }) => {
     const [menuList, setMenuList] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
-    const [isMenuLoaded, setIsMenuLoaded] = useState(false);
 
-    console.log("👀 EditOrderModal เปิดขึ้นโดยได้รับ order =", order);
-
-    if (!order || !order.orderItems) return null;
-
-    // โหลดเมนู
     useEffect(() => {
         const fetchMenus = async () => {
             try {
                 const res = await axiosInstance.get("/admin/menu");
-                setMenuList(res.data.menus || []);
-                setIsMenuLoaded(true);
+                setMenuList(res.data.menus);
             } catch (err) {
                 console.error("โหลดเมนูล้มเหลว", err);
             }
         };
+
+        const initial = order.orderItems.map(item => ({
+            menuId: item.menuId,
+            qty: item.qty || 1,
+            price: item.price,
+            name: item.menu?.name || ""
+        }));
+        setSelectedItems(initial);
         fetchMenus();
-    }, []);
+    }, [order]);
 
-    // 2. รอ menuList และ order พร้อมแล้ว ค่อย map
-    useEffect(() => {
-        if (!order || !menuList || menuList.length === 0) {
-            console.log("🟡 ยังไม่พร้อม map เพราะ menuList ยังว่างอยู่");
-            return;
-        }
-
-        const mappedItems = order.orderItems.map((item) => {
-            const menuId = item.menuId ?? item.menu?.id;
-            const existingMenu = menuList.find(m => m.id === Number(menuId));
-
-            if (!menuId || !existingMenu) {
-                console.warn("❌ ไม่พบ menuId ที่ถูกต้อง:", item);
-                return null;
-            }
-
-            return {
-                menuId: Number(menuId),
-                quantity: item.quantity,
-                price: item.price,
-                menu: existingMenu,
-            };
-        }).filter(Boolean);
-
-        setSelectedItems(mappedItems);
-        console.log("✅ initial selectedItems = ", mappedItems);
-    }, [menuList, order]);
-
-
-    // แก้จำนวน
     const handleQtyChange = (menuId, qty) => {
         const num = parseInt(qty);
         setSelectedItems(prev =>
@@ -63,65 +34,52 @@ const EditOrderModal = ({ order, token, onClose }) => {
         );
     };
 
-    // เพิ่มเมนูใหม่
     const handleAddItem = (menu) => {
         if (selectedItems.some(item => item.menuId === menu.id)) return;
         setSelectedItems([...selectedItems, {
             menuId: menu.id,
             qty: 1,
-            price: Number(menu.price || 0),
+            price: menu.price,
             name: menu.name
         }]);
     };
 
-    // ลบเมนู
     const handleRemoveItem = (menuId) => {
         setSelectedItems(prev => prev.filter(item => item.menuId !== menuId));
     };
 
-    // คำนวณยอดรวม
     const total = selectedItems.reduce((sum, item) =>
-        sum + ((item.qty && item.price) ? item.qty * item.price : 0), 0);
+        sum + ((item.qty && item.price) ? item.qty * item.price : 0)
+        , 0);
 
-    // บันทึก
     const handleSave = async () => {
-        const valid = selectedItems.every(item =>
-            Number.isInteger(item.menuId) &&
-            item.menuId > 0 &&
-            item.qty &&
-            !isNaN(item.qty) &&
-            !isNaN(item.price)
-        );
-
+        const valid = selectedItems.every(item => item.qty && !isNaN(item.qty));
         if (!valid) {
-            alert("มีรายการที่ไม่สมบูรณ์ กรุณาตรวจสอบเมนูอีกครั้ง");
+            alert("กรุณากรอกจำนวนให้ครบทุกเมนู");
             return;
         }
 
         try {
             const payload = {
                 orderItems: selectedItems.map(item => ({
-                    menuId: Number(item.menuId),
-                    qty: Number(item.qty),
-                    price: Number(item.price || 0)
+                    menuId: item.menuId,
+                    qty: item.qty,
+                    price: item.price 
                 })),
-                totalPrice: Number(total)
+                totalPrice: total
             };
-
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-
             onClose();
         } catch (err) {
-            console.error("❌ อัปเดตเมนูล้มเหลว:", err);
-            alert("บันทึกล้มเหลว กรุณาลองใหม่");
+            console.error("อัปเดตเมนูล้มเหลว", err);
         }
     };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded shadow-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto font-prompt">
+            <div className="bg-white rounded shadow-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto">
                 <h2 className="text-lg font-bold mb-4">แก้ไขเมนู</h2>
 
                 <div className="mb-4">
@@ -141,29 +99,20 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
                 <div>
                     <h3 className="font-semibold mb-2">เมนูที่เลือก:</h3>
-                    {selectedItems.length === 0 ? (
-                        <p className="text-gray-500">ยังไม่มีเมนูที่เลือก</p>
-                    ) : (
-                        selectedItems.map(item => (
-                            <div key={item.menuId} className="flex items-center justify-between border-b py-1">
-                                <span className="w-1/3 truncate">{item.name}</span>
-                                <input
-                                    type="number"
-                                    min={1}
-                                    className="border p-1 w-16 text-right"
-                                    value={item.qty}
-                                    onChange={e => handleQtyChange(item.menuId, e.target.value)}
-                                />
-                                <span className="w-1/4 text-right">
-                                    {isNaN(item.qty * item.price) ? "-" : item.qty * item.price}฿
-                                </span>
-                                <button
-                                    onClick={() => handleRemoveItem(item.menuId)}
-                                    className="text-red-500 ml-2"
-                                >ลบ</button>
-                            </div>
-                        ))
-                    )}
+                    {selectedItems.map(item => (
+                        <div key={item.menuId} className="flex items-center justify-between border-b py-1">
+                            <span>{item.name}</span>
+                            <input
+                                type="number"
+                                min={1}
+                                className="border p-1 w-16 text-right"
+                                value={item.qty}
+                                onChange={e => handleQtyChange(item.menuId, e.target.value)}
+                            />
+                            <span>{isNaN(item.qty * item.price) ? "-" : item.qty * item.price}฿</span>
+                            <button onClick={() => handleRemoveItem(item.menuId)} className="text-red-500 ml-2">ลบ</button>
+                        </div>
+                    ))}
                 </div>
 
                 <div className="mt-4 text-right">
