@@ -17,12 +17,18 @@ const EditOrderModal = ({ order, token, onClose }) => {
 
         const initial = order.orderItems
             .filter(item => item.menuId != null)
-            .map(item => ({
-                menuId: Number(item.menuId),
-                qty: Number(item.qty || 1),
-                price: Number(item.price || 0),
-                name: item.menu?.name || ""
-            }));
+            .map(item => {
+                const menuId = Number(item.menuId);
+                const menuName = item.menu?.name || ""; 
+                const price = Number(item.price || 0);
+                const qty = Number(item.qty || 1);
+                return {
+                    menuId,
+                    qty,
+                    price,
+                    name: menuName,
+                };
+            });
 
         setSelectedItems(initial);
         fetchMenus();
