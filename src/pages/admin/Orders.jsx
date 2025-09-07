@@ -255,14 +255,12 @@ const Orders = () => {
                 <td className="border px-4 py-3">{order.user?.username || "guest"}</td>
                 <td className="border px-4 py-3 text-left">
                   <div className="space-y-1">
-                    {order.orderItems
-                      ?.filter((item) => item.menu)
-                      .map((item, idx) => (
-                        <div key={idx}>
-                          • {item.menu.name} × {item.quantity}{" "}
-                          <span className="text-gray-500">({item.price}฿)</span>
-                        </div>
-                      ))}
+                    {order.orderItems?.map((item, idx) => (
+                      <div key={idx}>
+                        • {item.menu?.name} × {item.quantity}{" "}
+                        <span className="text-gray-500">({item.price}฿)</span>
+                      </div>
+                    ))}
                     <button
                       onClick={() => setEditOrder(order)}
                       className="inline-flex items-center gap-1 text-yellow-700 text-xs bg-yellow-100 hover:bg-yellow-200 px-2 py-[2px] rounded shadow-sm"
