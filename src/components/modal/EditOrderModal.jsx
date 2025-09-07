@@ -64,7 +64,7 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 orderItems: selectedItems.map(item => ({
                     menuId: Number(item.menuId),
                     qty: Number(item.qty),
-                    price: Number(item.price)
+                    price: Number(item.price || 0)
                 })),
                 totalPrice: Number(total)
             };
