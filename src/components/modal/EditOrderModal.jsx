@@ -22,12 +22,15 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 }));
                 setMenuList(menus);
 
-                const initial = order.orderItems.map(item => ({
-                    menuId: Number(item.menuId ?? item.menu?.id ?? 0),
-                    qty: Number(item.qty) || 1,
-                    price: toNumber(item.price ?? item.menu?.price ?? 0),
-                    name: item.menu?.name || ""
-                }));
+                const initial = order.orderItems
+                    .map(item => {
+                        const menuId = Number(item.menuId ?? item.menu?.id);
+                        const price = toNumber(item.price ?? item.menu?.price);
+                        const name = item.menu?.name || "";
+
+                        return { menuId, qty: Number(item.qty) || 1, price, name };
+                    })
+                    .filter(it => Number.isInteger(it.menuId) && it.menuId > 0); // ✅ ลบตัวที่ไม่มี menuId ออก
                 setSelectedItems(initial);
                 console.table(initial);
 
