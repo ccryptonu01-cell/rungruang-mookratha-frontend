@@ -15,12 +15,15 @@ const EditOrderModal = ({ order, token, onClose }) => {
             }
         };
 
-        const initial = order.orderItems.map(item => ({
-            menuId: Number(item.menuId),
-            qty: Number(item.qty || 1),
-            price: Number(item.price || 0),
-            name: item.menu?.name || ""
-        }));
+        const initial = order.orderItems
+            .filter(item => item.menuId != null)
+            .map(item => ({
+                menuId: Number(item.menuId),
+                qty: Number(item.qty || 1),
+                price: Number(item.price || 0),
+                name: item.menu?.name || ""
+            }));
+
         setSelectedItems(initial);
         fetchMenus();
     }, [order]);
@@ -53,16 +56,19 @@ const EditOrderModal = ({ order, token, onClose }) => {
         , 0);
 
     const handleSave = async () => {
-        const valid = selectedItems.every(
-            item =>
-                item.menuId !== null &&
-                !isNaN(item.menuId) &&
-                item.qty &&
-                !isNaN(item.qty) &&
-                !isNaN(item.price)
+        console.log("🚀 เริ่ม handleSave", selectedItems);
+
+        const valid = selectedItems.every(item =>
+            Number.isInteger(item.menuId) &&
+            item.menuId > 0 &&
+            item.qty &&
+            !isNaN(item.qty) &&
+            !isNaN(item.price)
         );
 
+
         if (!valid) {
+            console.warn("❌ มีรายการที่ไม่สมบูรณ์:", selectedItems);
             alert("มีรายการที่ไม่สมบูรณ์ กรุณาตรวจสอบเมนูอีกครั้ง");
             return;
         }
@@ -76,12 +82,17 @@ const EditOrderModal = ({ order, token, onClose }) => {
                 })),
                 totalPrice: Number(total)
             };
+
+            console.log("📦 payload ที่จะส่ง:", payload);
+
             await axiosInstance.put(`/admin/orders/detail/${order.id}`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
+            console.log("✅ อัปเดตเมนูสำเร็จ");
             onClose();
         } catch (err) {
-            console.error("อัปเดตเมนูล้มเหลว", err);
+            console.error("❌ อัปเดตเมนูล้มเหลว:", err);
         }
     };
 
