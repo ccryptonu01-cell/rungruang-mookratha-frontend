@@ -13,4 +13,34 @@
   <script type="module" src="/src/main.jsx"></script>
 </body>
 
+<script>
+  // ปิดการกด F12, Ctrl+Shift+I, Ctrl+U
+  document.onkeydown = function (e) {
+    // F12
+    if (e.key === "F12") {
+      alert("⛔ ไม่อนุญาตให้เปิด Developer Tools");
+      e.preventDefault();
+      return false;
+    }
+    // Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "I") {
+      alert("⛔ ไม่อนุญาตให้เปิด Developer Tools");
+      e.preventDefault();
+      return false;
+    }
+    // Ctrl+U
+    if (e.ctrlKey && e.key.toUpperCase() === "U") {
+      alert("⛔ ไม่อนุญาตให้ดู Source Code");
+      e.preventDefault();
+      return false;
+    }
+  };
+
+  // ปิดคลิกขวา
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+    alert("⛔ ไม่อนุญาตให้คลิกขวา");
+  });
+</script>
+
 </html>
