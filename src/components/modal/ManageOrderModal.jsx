@@ -119,12 +119,6 @@ const ManageOrderModal = ({ order, token, onClose }) => {
                         🧾 พิมพ์ใบเสร็จโต๊ะนี้ (PDF)
                     </button>
 
-                    <button
-                        onClick={() => setIsCombineOpen(true)}
-                        className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded"
-                    >
-                        📄 รวมใบเสร็จโต๊ะ (เลือกออเดอร์)
-                    </button>
                 </div>
 
                 <div className="space-y-3">
