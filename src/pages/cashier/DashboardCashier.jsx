@@ -47,7 +47,7 @@ const Dashboard = () => {
       } else if (Array.isArray(data.reservations)) {
         setReservations(data.reservations);
       } else {
-        setReservations([]); // fallback
+        setReservations([]);
       }
     } catch (err) {
       console.error("โหลดการจองล้มเหลว", err);
@@ -116,8 +116,6 @@ const Dashboard = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-4">📊 แดชบอร์ด</h1>
-
-      <DashboardAlertCashier />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white p-4 rounded shadow">
