@@ -117,6 +117,8 @@ const Dashboard = () => {
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-4">📊 แดชบอร์ด</h1>
 
+      <DashboardAlertCashier />
+
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white p-4 rounded shadow">
           <h2 className="text-gray-700 font-semibold">ยอดขายรวม</h2>
@@ -134,19 +136,6 @@ const Dashboard = () => {
             {reservedTables}
           </p>
         </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <h2 className="text-lg font-semibold mb-3">📈 ยอดขายย้อนหลัง 7 วัน</h2>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="ยอดขาย" fill="#4ade80" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
       </div>
 
       <DisplayResultsCashier orders={filteredOrders} defaultTab="latest" />
