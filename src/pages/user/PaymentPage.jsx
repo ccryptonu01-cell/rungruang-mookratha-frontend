@@ -125,7 +125,7 @@ const PaymentPage = () => {
                         className={`px-4 py-2 rounded font-medium ${method === m ? "bg-blue-600 text-white" : "bg-gray-200"}`}
                     >
                         {m === "PROMPTPAY" && "พร้อมเพย์"}
-                        {m === "QR" && "แสกน QR Code"}
+                        {m === "QR" && "สแกน QR Code"}
                         {m === "CASH" && "เงินสด"}
                     </button>
                 ))}
